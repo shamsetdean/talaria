@@ -477,7 +477,7 @@ function acStop(inp){
   if(q.length<3){document.getElementById('ac-stop').style.display='none';return}
   acStopT=setTimeout(async()=>{
     try{
-      const d=await prim('coverage/idfm/places',{q,'type[]':'stop_area',count:6});
+      const d=await prim('places',{q,'type[]':'stop_area',count:6});
       const places=(d.places||[]).filter(p=>p.embedded_type==='stop_area');
       const list=document.getElementById('ac-stop');
       if(!places.length){list.style.display='none';return}
@@ -532,7 +532,7 @@ async function doRoute(){
   out.innerHTML=`<div class="loader"><div class="spin"></div>Calcul en cours…</div>`;
   try{
     const[fc,tc]=await Promise.all([geo(from),geo(to)]);
-    const data=await prim('coverage/idfm/journeys',{from:`${fc.lon};${fc.lat}`,to:`${tc.lon};${tc.lat}`,count:5});
+    const data=await prim('journeys',{from:`${fc.lon};${fc.lat}`,to:`${tc.lon};${tc.lat}`,count:5});
     renderJourneys(data,out,to);
   }catch(e){out.innerHTML=`<div class="err">${e.message}</div>`}
   finally{btn.disabled=false}
@@ -640,7 +640,7 @@ async function doStop(){
   try{
     let id=selStopId;
     if(!id){
-      const pd=await prim('coverage/idfm/places',{q,'type[]':'stop_area',count:1});
+      const pd=await prim('places',{q,'type[]':'stop_area',count:1});
       const pl=(pd.places||[]).find(p=>p.embedded_type==='stop_area');
       if(!pl)throw new Error(`Arrêt "${q}" introuvable.`);
       id=pl.stop_area?.id||pl.id;
@@ -655,7 +655,7 @@ async function doStop(){
 
 async function loadDep(stopId,container,name){
   try{
-    const data=await prim(`coverage/idfm/stop_areas/${encodeURIComponent(stopId)}/departures`,{count:20,duration:7200});
+    const data=await prim(`stop_areas/${encodeURIComponent(stopId)}/departures`,{count:20,duration:7200});
     renderDep(data,container,name,stopId);
   }catch(e){container.innerHTML=`<div class="err">${e.message}</div>`}
 }
@@ -737,7 +737,7 @@ function doLocate(){
     const{latitude:lat,longitude:lon}=pos.coords;
     map.setView([lat,lon],15);
     try{
-      const d=await prim('coverage/idfm/places_nearby',{lon,lat,'type[]':'stop_area',count:1,distance:600});
+      const d=await prim('places_nearby',{lon,lat,'type[]':'stop_area',count:1,distance:600});
       const pl=(d.places_nearby||[])[0];
       if(!pl)throw new Error('Aucun arrêt dans un rayon de 600m.');
       const name=pl.stop_area?.name||pl.name,id=pl.stop_area?.id||pl.id;
