@@ -1,6 +1,5 @@
 // api/prim.js — Vercel Serverless Function — Talaria
-// URL PRIM correcte (depuis migration 2024) :
-// https://prim.iledefrance-mobilites.fr/marketplace/navitia/{feature}?params
+// URL correcte PRIM 2024 : /marketplace/v2/navitia/{feature} (sans coverage)
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,31 +15,31 @@ export default async function handler(req, res) {
   if (!path) return res.status(400).json({ error: 'Paramètre path manquant.' });
 
   // Reconstruire les query params
-  // Ne pas encoder ";" dans les coordonnées lon;lat (format PRIM)
+  // Ne pas encoder ";" dans les coordonnées lon;lat
   const parts = [];
   url.searchParams.forEach((val, key) => {
     if (key === 'path') return;
-    if (val.includes(';')) {
+    if (String(val).includes(';')) {
       parts.push(`${encodeURIComponent(key)}=${val}`);
     } else {
       parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(val)}`);
     }
   });
 
-  // URL PRIM correcte : sans "coverage/idfm"
-  const primUrl = `https://prim.iledefrance-mobilites.fr/marketplace/navitia/${path}${parts.length ? '?' + parts.join('&') : ''}`;
+  // URL PRIM correcte post-2024 : marketplace/v2/navitia/ + feature (pas de coverage)
+  const primUrl = `https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/${path}${parts.length ? '?' + parts.join('&') : ''}`;
 
-  console.log('[Talaria] PRIM →', primUrl);
+  console.log('[Talaria] →', primUrl);
 
   try {
     const upstream = await fetch(primUrl, {
       headers: { 'apiKey': token, 'Accept': 'application/json' }
     });
     const text = await upstream.text();
-    console.log('[Talaria] status:', upstream.status, '| preview:', text.slice(0, 150));
+    console.log('[Talaria] status:', upstream.status, '| preview:', text.slice(0, 200));
     let data;
     try { data = JSON.parse(text); }
-    catch { data = { error: text.slice(0, 500) }; }
+    catch { data = { raw: text.slice(0, 500) }; }
     return res.status(upstream.status).json(data);
   } catch (err) {
     return res.status(502).json({ error: `Erreur proxy : ${err.message}` });
