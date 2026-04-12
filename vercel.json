@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/prim(.*)", "destination": "/api/prim" }
+  ]
+}
