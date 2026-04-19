@@ -1687,7 +1687,8 @@ function renderAlerts() {
   const svgAI = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>`;
   const svgTip = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
   const preds = [
-    { icon: svgAlert, title: rush ? 'Heure de pointe active' : 'Trafic fluide', body: rush ? 'Affluence accrue sur les lignes 13, A, B. Prévoir +5 à +10 min.' : 'Conditions de voyage normales. Bonne route !', color: rush ? '#ff9f43' : '#00d68f', time: 'Maintenant' },
+    { icon: svgAlert, title: rush ? 'Heure de pointe active' : 'Trafic fluide', body: rush ? 'Affluence accrue sur les lignes 13, A, B. Prévoir +5 à +10 min.' : 'Conditions de voyage normales. Bonne route !', color: rush ? '#ff9f43' : '#00d68f', time: 'Maintenant'   appendDisruptions();
+},
     { icon: svgAI, title: 'Prédiction IA — RER B', body: 'Retards fréquents entre 8h–9h30. Prévoir un départ anticipé.', color: '#4488ff', time: 'Prédiction' },
     { icon: svgTip, title: 'Conseil', body: h < 12 ? 'Évitez le Métro 4 direction Montrouge avant 9h30.' : 'La ligne 13 est souvent chargée entre 18h et 20h.', color: '#a855f7', time: 'Suggestion' }
   ];
@@ -2020,23 +2021,7 @@ function getWeatherImpact() {
   return null;
 }
 
-// ══════════════════════════════════════════════════════
-// PATCHING renderAlerts pour ajouter perturbations réelles
-// ══════════════════════════════════════════════════════
-const _baseRenderAlerts = renderAlerts;
-renderAlerts = function() {
-  _baseRenderAlerts();
-  const el = document.getElementById('alerts-body');
-  if (!el) return;
-  // Ajouter section perturbations
-  const disruptSection = document.createElement('div');
-  disruptSection.style.cssText = 'font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 10px';
-  disruptSection.textContent = 'Perturbations en cours';
-  el.appendChild(disruptSection);
-  const disruptContainer = document.createElement('div');
-  el.appendChild(disruptContainer);
-  fetchDisruptions().then(() => renderDisruptions(disruptContainer));
-};
+// Perturbations appelées via appendDisruptions() dans renderAlerts
 
 // ══════════════════════════════════════════════════════
 // BOUTON VÉLIB sur la carte
@@ -2058,6 +2043,24 @@ document.addEventListener('DOMContentLoaded', () => {
 // ══════════════════════════════════════════════════════
 // INIT APIs au démarrage
 // ══════════════════════════════════════════════════════
+
+function appendDisruptions() {
+  const el = document.getElementById('alerts-body');
+  if (!el) return;
+  const sec = document.createElement('div');
+  sec.style.fontSize = '10px';
+  sec.style.fontFamily = "'JetBrains Mono',monospace";
+  sec.style.color = 'var(--ink3)';
+  sec.style.letterSpacing = '.1em';
+  sec.style.textTransform = 'uppercase';
+  sec.style.margin = '16px 0 10px';
+  sec.textContent = 'Perturbations en cours';
+  el.appendChild(sec);
+  const box = document.createElement('div');
+  el.appendChild(box);
+  fetchDisruptions().then(() => renderDisruptions(box));
+}
+
 ;(async function initAPIs() {
   // Attendre la géoloc pour les APIs basées position
   if (navigator.geolocation) {
