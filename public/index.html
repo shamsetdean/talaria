@@ -56,7 +56,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit'
 .mapbtn svg{width:18px;height:18px;stroke-width:2}
 
 /* SHEET */
-.sheet{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;height:72vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7)}
+.sheet{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;flex-direction:column;height:55vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7)}
 .handle{width:36px;height:4px;background:var(--b3);border-radius:99px;margin:10px auto 0;flex-shrink:0}
 
 /* TABS */
@@ -870,13 +870,18 @@ function doLocate(){
 }
 
 async function loadNearbyStops(lat,lon){
+  const out=document.getElementById('nearby-out');
   if(lat==null||lon==null){
-    if(!navigator.geolocation)return;
-    navigator.geolocation.getCurrentPosition(p=>loadNearbyStops(p.coords.latitude,p.coords.longitude),()=>{},{timeout:8000,maximumAge:60000});
+    if(!navigator.geolocation){out.innerHTML='<div class="err">Géolocalisation non disponible.</div>';return}
+    out.innerHTML='<div class="loader"><div class="spin"></div>Localisation…</div>';
+    navigator.geolocation.getCurrentPosition(
+      p=>loadNearbyStops(p.coords.latitude,p.coords.longitude),
+      ()=>{out.innerHTML='<div class="err">Position inaccessible.</div>'},
+      {enableHighAccuracy:true,timeout:10000,maximumAge:30000}
+    );
     return;
   }
-  const out=document.getElementById('nearby-out');
-  out.innerHTML=`<div class="loader"><div class="spin"></div>Arrêts proches…</div>`;
+  out.innerHTML='<div class="loader"><div class="spin"></div>Arrêts proches…</div>';
   try{
     const d=await prim('places',{q:`${lon};${lat}`,'type[]':'stop_area',count:8});
     const places=( d.places||[]).filter(p=>p.embedded_type==='stop_area');
