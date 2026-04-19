@@ -200,7 +200,8 @@ textarea:focus{border-color:var(--b3)}
 .inc-meta{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:5px}
 
 /* NOTIF */
-.notif-banner{position:fixed;top:calc(64px + var(--st));left:12px;right:12px;z-index:200;background:var(--d3);border:1px solid var(--b3);border-radius:var(--r);padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.7);display:flex;align-items:center;gap:12px;animation:slideDown .3s ease;transform:translateY(-120px);opacity:0;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.notif-banner{position:fixed;top:calc(64px + var(--st));left:12px;right:12px;z-index:200;background:var(--d3);border:1px solid var(--b3);border-radius:var(--r);padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.7);display:flex;align-items:center;gap:12px;transform:translateY(-120px);opacity:0;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .4s}
+@keyframes slideDown{from{transform:translateY(-120px);opacity:0}to{transform:translateY(0);opacity:1}}
 .notif-banner.show{transform:translateY(0);opacity:1}
 .notif-icon{font-size:22px;flex-shrink:0}
 .notif-body{flex:1}
@@ -450,6 +451,7 @@ async function geo(q){
 }
 async function geoSug(q){
   const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q+', Île-de-France')}&accept-language=fr`,{headers:{'User-Agent':'Talaria/1.0'}});
+  if(!r.ok)throw new Error(`Nominatim erreur ${r.status}`);
   return r.json();
 }
 
@@ -487,8 +489,10 @@ function acStop(inp){
         return`<div class="aci" onclick="pickStop('${n.replace(/'/g,"\\'").replace(/"/g,'\\"')}','${id}',${lat},${lon})">${n}</div>`;
       }).join('');
       list.style.display='block';
-    }catch(e){}
-  },350);
+    }catch(e){
+      const list=document.getElementById('ac-stop');
+      list.style.display='none';
+    }},350);
 }
 function pickStop(name,id,lat,lng){
   document.getElementById('stopQ').value=name;
@@ -794,7 +798,8 @@ function submitIncident(){
     a.href=`mailto:contact-prim@iledefrance-mobilites.fr?subject=${subject}&body=${body}`;
     a.style.display='none';
     document.body.appendChild(a);
-    // On ne force pas l'ouverture auto — on propose juste
+    a.click();
+    setTimeout(()=>document.body.removeChild(a),500);
   }
 }
 
