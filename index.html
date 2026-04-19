@@ -240,6 +240,127 @@ textarea:focus{border-color:var(--b3)}
 .stop-popup-head{padding:12px 16px 10px;border-bottom:1px solid var(--b1);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .stop-popup-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(12px + var(--sb))}
 
+
+/* ═══ ANIMATIONS STYLE FRAMER MOTION ═══ */
+
+/* Entrée slide-up avec fade — cartes itinéraires */
+@keyframes slideUpFade {
+  from { opacity:0; transform:translateY(22px) scale(.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+/* Entrée depuis la droite */
+@keyframes slideInRight {
+  from { opacity:0; transform:translateX(28px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+/* Entrée depuis le bas (pages) */
+@keyframes slideInUp {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+/* Scale pop (boutons, badges) */
+@keyframes scalePop {
+  0%   { transform:scale(.8);  opacity:0; }
+  60%  { transform:scale(1.06); opacity:1; }
+  100% { transform:scale(1);   opacity:1; }
+}
+/* Shimmer (skeleton loader) */
+@keyframes shimmer {
+  0%   { background-position:-400px 0; }
+  100% { background-position:400px 0; }
+}
+/* Pulse douce (indicateur heure de pointe) */
+@keyframes softPulse {
+  0%,100% { opacity:1; }
+  50%     { opacity:.55; }
+}
+/* Bounce léger (marqueurs carte) */
+@keyframes markerBounce {
+  0%   { transform:translateY(-18px) scale(.7); opacity:0; }
+  55%  { transform:translateY(4px) scale(1.05); opacity:1; }
+  75%  { transform:translateY(-3px) scale(.98); }
+  100% { transform:translateY(0) scale(1); }
+}
+/* Rotation douce (icône géoloc loading) */
+@keyframes rotateSmooth {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+/* Fade slide sheet panels */
+@keyframes panelIn {
+  from { opacity:0; transform:translateX(12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+/* Notification slide down */
+@keyframes notifIn {
+  from { transform:translateY(-110%); opacity:0; }
+  to   { transform:translateY(0);     opacity:1; }
+}
+/* Card open expand */
+@keyframes expandIn {
+  from { opacity:0; max-height:0; }
+  to   { opacity:1; max-height:600px; }
+}
+
+/* Classes utilitaires */
+.fm-slide-up    { animation: slideUpFade .38s cubic-bezier(.2,.8,.2,1) both; }
+.fm-slide-right { animation: slideInRight .32s cubic-bezier(.2,.8,.2,1) both; }
+.fm-slide-page  { animation: slideInUp .35s cubic-bezier(.2,.8,.2,1) both; }
+.fm-scale-pop   { animation: scalePop .35s cubic-bezier(.34,1.56,.64,1) both; }
+.fm-bounce-marker { animation: markerBounce .5s cubic-bezier(.34,1.2,.64,1) both; }
+
+/* Stagger delays pour listes */
+.fm-d1 { animation-delay:.05s }
+.fm-d2 { animation-delay:.10s }
+.fm-d3 { animation-delay:.15s }
+.fm-d4 { animation-delay:.20s }
+.fm-d5 { animation-delay:.25s }
+
+/* Boutons — feedback tactile */
+.btn-blue  { transition: opacity .15s, transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important; }
+.btn-blue:active  { transform:scale(.96) !important; }
+.btn-ghost { transition: opacity .15s, transform .12s, background .15s !important; }
+.btn-ghost:active { transform:scale(.96) !important; }
+.mapbtn    { transition: background .15s, transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important; }
+.mapbtn:active { transform:scale(.88) !important; }
+.tbb { transition: color .18s, transform .12s !important; }
+.tbb:active { transform:scale(.88) !important; }
+.stab { transition: color .15s, transform .1s !important; }
+.stab:active { transform:scale(.9) !important; }
+.depcard, .fav-card, .nearby-card { transition: transform .15s cubic-bezier(.2,.8,.2,1), border-color .2s, background .15s !important; }
+.depcard:active, .fav-card:active, .nearby-card:active { transform:scale(.98) !important; }
+.jcard { transition: border-color .2s, transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s !important; }
+.jcard:active { transform:scale(.99) !important; }
+
+/* Sheet — transition hauteur fluide */
+.sheet { transition: height .42s cubic-bezier(.2,.8,.2,1) !important; }
+
+/* Skeleton loader animé */
+.skeleton {
+  background: linear-gradient(90deg, var(--d3) 25%, var(--d4) 50%, var(--d3) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+
+/* Page transitions */
+.pg.on { animation: slideInUp .35s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Notif banner */
+.notif.show { animation: notifIn .38s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Popup arrêt */
+.stop-popup.on { transition: transform .38s cubic-bezier(.2,.8,.2,1) !important; }
+
+/* Tab indicator slide */
+.tbb.on::after { transition: left .2s cubic-bezier(.2,.8,.2,1), width .2s !important; }
+
+/* Rush banner pulse */
+#rush-banner { animation: softPulse 2.5s ease infinite; }
+
+/* Tap card */
+.tap-card.on { animation: slideUpFade .35s cubic-bezier(.2,.8,.2,1) both; }
+
 /* ROUTE ANIMATED */
 @keyframes dashMove{to{stroke-dashoffset:-20}}
 .route-animated{animation:dashMove .6s linear infinite}
@@ -844,7 +965,7 @@ async function doRoute() {
   const btn = document.getElementById('routeBtn');
   if (!fromVal || !toVal) { out.innerHTML = '<div class="err">Renseignez départ et arrivée.</div>'; return; }
   btn.disabled = true;
-  out.innerHTML = '<div class="loader"><div class="spin"></div>Calcul en cours…</div>';
+  showSkeletons(out);
   document.getElementById('opt-pills').style.display = 'none';
   try {
     const fc = fromCoordStored || await geo(fromVal);
