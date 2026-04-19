@@ -727,9 +727,9 @@ let stop2Id = null, stop2Name = null, stop2Timer = null, stop2Cd = null;
 const map = L.map('map', { center: [48.8566, 2.3522], zoom: 12, zoomControl: false, attributionControl: false });
 // Tiles avec fallback automatique
 const tileProviders = [
+  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
 ];
 let tileLayer = L.tileLayer(tileProviders[0], { maxZoom: 19 });
 let _tileProviderIdx = 0;
