@@ -245,6 +245,28 @@ textarea:focus{border-color:var(--b3)}
 .sp-dist{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--green);margin-top:2px}
 .sp-close{width:32px;height:32px;background:var(--d3);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:14px}
 .sp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(16px + var(--sb))}
+
+/* TAP-TO-ROUTE */
+.tap-mode-btn{position:fixed;bottom:calc(55vh + 14px);right:14px;z-index:50;width:44px;height:44px;background:var(--d2);border:1px solid var(--b3);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);backdrop-filter:blur(16px);box-shadow:0 4px 16px rgba(0,0,0,.5);transition:background .15s,transform .1s}
+.tap-mode-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 4px 20px var(--blueglow)}
+.tap-mode-btn:active{transform:scale(.92)}
+.tap-mode-btn svg{width:18px;height:18px;stroke-width:2}
+.tap-hint{position:fixed;bottom:calc(55vh + 14px);left:50%;transform:translateX(-50%);z-index:50;background:var(--d3);border:1px solid var(--b3);border-radius:99px;padding:8px 16px;font-size:12px;font-family:"Outfit",sans-serif;color:var(--ink2);backdrop-filter:blur(16px);box-shadow:0 4px 16px rgba(0,0,0,.5);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s}
+.tap-hint.show{opacity:1}
+/* ROUTE CARD (résultat rapide) */
+.rcard-overlay{position:fixed;inset:0;z-index:300;pointer-events:none}
+.rcard{position:fixed;bottom:calc(55vh + 10px);left:12px;right:12px;z-index:310;background:var(--d1);border:1px solid var(--b2);border-radius:var(--r);padding:16px;box-shadow:0 -4px 32px rgba(0,0,0,.8);transform:translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s;pointer-events:none}
+.rcard.show{transform:translateY(0);opacity:1;pointer-events:all}
+.rcard-dest{font-size:12px;font-family:"JetBrains Mono",monospace;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rcard-main{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.rcard-dur{font-size:32px;font-weight:300;letter-spacing:-.04em;color:var(--ink)}
+.rcard-dur b{font-size:13px;font-weight:400;color:var(--ink2);margin-left:2px}
+.rcard-times{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--ink);text-align:right}
+.rcard-arr{font-size:11px;color:var(--green);font-weight:600;margin-top:2px}
+.rcard-pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.rcard-btns{display:flex;gap:8px}
+.rcard-close{position:absolute;top:10px;right:12px;width:28px;height:28px;background:var(--d4);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:12px}
+
 </style>
 </head>
 <body>
@@ -503,6 +525,139 @@ function placeNearbyMarkers(stops,uLat,uLon){
     const m=L.marker([s.lat,s.lon],{icon}).addTo(map).on('click',()=>openStopPopup(s,uLat,uLon));
     nearbyMarkers.push(m);
   });
+}
+
+
+// ═══════════════════════════════
+// TAP-TO-ROUTE
+// ═══════════════════════════════
+let tapModeActive=false,destMarker=null,lastTapRoute=null,lastTapLatLon=null;
+
+function toggleTapMode(){
+  tapModeActive=!tapModeActive;
+  const btn=document.getElementById('tapBtn');
+  const hint=document.getElementById('tapHint');
+  btn.classList.toggle('active',tapModeActive);
+  hint.classList.toggle('show',tapModeActive);
+  map.getContainer().style.cursor=tapModeActive?'crosshair':'';
+  if(!tapModeActive){hint.classList.remove('show')}
+}
+
+map.on('click',async function(e){
+  if(!tapModeActive)return;
+  const{lat,lng}=e.latlng;
+  lastTapLatLon={lat,lon:lng};
+
+  // Placer marqueur destination
+  if(destMarker)map.removeLayer(destMarker);
+  destMarker=L.marker([lat,lng],{
+    icon:L.divIcon({
+      className:'',
+      html:`<div style="width:32px;height:32px;background:#ff4757;border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 12px rgba(255,71,87,.6)"></div>`,
+      iconSize:[32,32],iconAnchor:[16,32]
+    })
+  }).addTo(map);
+
+  // Reverse geocode
+  const rcardDest=document.getElementById('rcardDest');
+  rcardDest.textContent='Chargement…';
+  document.getElementById('rcard').classList.add('show');
+  document.getElementById('rcardDur').innerHTML='<div class="spin" style="width:20px;height:20px;border:2px solid rgba(238,238,255,.2);border-top-color:#4488ff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></div>';
+  document.getElementById('rcardPills').innerHTML='';
+  document.getElementById('rcardArr').textContent='';
+  document.getElementById('rcardTimes').textContent='';
+
+  // Reverse geocode Nominatim
+  let destLabel=`${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=fr`,{headers:{'User-Agent':'Talaria/1.0'}});
+    const d=await r.json();
+    const a=d.address;
+    destLabel=a?.road?(a.house_number?`${a.house_number} ${a.road}`:a.road):(a?.suburb||a?.neighbourhood||a?.town||a?.city||destLabel);
+  }catch(e){}
+  rcardDest.textContent=destLabel;
+
+  // Calcul itinéraire depuis position utilisateur
+  try{
+    // Récupérer position utilisateur
+    let fromLat,fromLon;
+    if(uMarker){
+      const ll=uMarker.getLatLng();
+      fromLat=ll.lat;fromLon=ll.lng;
+    }else{
+      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:6000}));
+      fromLat=pos.coords.latitude;fromLon=pos.coords.longitude;
+      if(uMarker)map.removeLayer(uMarker);
+      uMarker=L.circleMarker([fromLat,fromLon],{radius:9,fillColor:'#4488ff',fillOpacity:1,color:'#fff',weight:2.5}).addTo(map);
+    }
+
+    const data=await prim('journeys',{from:`${fromLon};${fromLat}`,to:`${lng};${lat}`,count:3});
+    const journeys=(data.journeys||[]).sort((a,b)=>a.duration-b.duration);
+    if(!journeys.length)throw new Error('Aucun itinéraire trouvé.');
+
+    const best=journeys[0];
+    lastTapRoute={journeys,destLabel,fromLat,fromLon,destLat:lat,destLon:lng};
+
+    // Afficher résultat
+    const dur=s2m(best.duration);
+    document.getElementById('rcardDur').innerHTML=dur.replace(' min','<b> min</b>');
+    const arr=fmtT(best.arrival_date_time),dep=fmtT(best.departure_date_time);
+    document.getElementById('rcardTimes').textContent=`${dep} → ${arr}`;
+    document.getElementById('rcardArr').textContent=`Arrivée à ${arr}`;
+
+    const sections=(best.sections||[]).filter(s=>s.type!=='waiting');
+    const pills=sections.map(s=>{
+      const mode=modeOf(s);
+      if(mode==='WALK'&&s.duration<120)return'';
+      const code=s.display_informations?.label||s.display_informations?.code||'';
+      return`<span class="pill ${mode}">${mode==='WALK'?'🚶 pied':(code||mode)}</span>`;
+    }).filter(Boolean).join('');
+    document.getElementById('rcardPills').innerHTML=pills||'<span class="pill WALK">🚶 À pied</span>';
+
+    // Tracer le meilleur itinéraire
+    drawRoute(best);
+    // Remettre le marqueur destination (drawRoute efface tout)
+    if(destMarker)map.removeLayer(destMarker);
+    destMarker=L.marker([lat,lng],{
+      icon:L.divIcon({
+        className:'',
+        html:`<div style="width:32px;height:32px;background:#ff4757;border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 12px rgba(255,71,87,.6)"></div>`,
+        iconSize:[32,32],iconAnchor:[16,32]
+      })
+    }).addTo(map);
+
+  }catch(err){
+    document.getElementById('rcardDur').innerHTML='<span style="font-size:14px;color:var(--red)">'+err.message+'</span>';
+  }
+
+  // Désactiver le mode tap après sélection
+  tapModeActive=false;
+  document.getElementById('tapBtn').classList.remove('active');
+  document.getElementById('tapHint').classList.remove('show');
+  map.getContainer().style.cursor='';
+});
+
+function closeRcard(){
+  document.getElementById('rcard').classList.remove('show');
+  if(destMarker){map.removeLayer(destMarker);destMarker=null}
+  // Effacer les couches de route
+  rLayers.forEach(l=>map.removeLayer(l));rLayers=[];
+}
+
+function openFullRoute(){
+  if(!lastTapRoute)return;
+  // Remplir les champs trajet et basculer sur l'onglet
+  const{journeys,destLabel,fromLat,fromLon}=lastTapRoute;
+  window._journeys=journeys;
+  const fromInp=document.getElementById('from');
+  fromInp.value='Ma position';
+  fromInp.dataset.lat=fromLat;
+  fromInp.dataset.lon=fromLon;
+  document.getElementById('to').value=destLabel;
+  const out=document.getElementById('route-out');
+  renderJourneys({journeys},out,destLabel);
+  goTab('route');
+  closeRcard();
 }
 
 // ═══════════════════════════════
@@ -854,7 +1009,7 @@ function doLocate(){
     if(uMarker)map.removeLayer(uMarker);
     uMarker=L.circleMarker([lat,lon],{radius:9,fillColor:'#4488ff',fillOpacity:1,color:'#fff',weight:2.5}).addTo(map);
     try{
-      const d=await prim('places',{q:`${lon};${lat}`,'type[]':'stop_area',count:1});
+      const d=await prim('places',{coord:`${lon};${lat}`,'type[]':'stop_area',count:6});
       const pl=(d.places||[]).find(p=>p.embedded_type==='stop_area');
       if(!pl)throw new Error('Aucun arrêt dans un rayon de 600m.');
       const name=pl.stop_area?.name||pl.name,id=pl.stop_area?.id||pl.id;
@@ -883,8 +1038,8 @@ async function loadNearbyStops(lat,lon){
   }
   out.innerHTML='<div class="loader"><div class="spin"></div>Arrêts proches…</div>';
   try{
-    const d=await prim('places',{q:`${lon};${lat}`,'type[]':'stop_area',count:8});
-    const places=( d.places||[]).filter(p=>p.embedded_type==='stop_area');
+    const d=await prim('places',{coord:`${lon};${lat}`,'type[]':'stop_area',count:8});
+    const places=(d.places||[]).filter(p=>p.embedded_type==='stop_area');
     if(!places.length){out.innerHTML='';return}
     const stops=places.map(p=>{
       const sa=p.stop_area||p;
