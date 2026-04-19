@@ -67,7 +67,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit'
 .pg-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 16px calc(16px + var(--sb))}
 
 /* SHEET — position au dessus de la tabbar */
-.sheet{position:fixed;bottom:calc(52px + var(--sb));left:0;right:0;z-index:100;display:flex;flex-direction:column;height:55vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7);transition:height .3s cubic-bezier(.2,.8,.2,1)}
+.sheet{position:fixed;bottom:calc(52px + var(--sb));left:0;right:0;z-index:100;display:flex;flex-direction:column;height:42vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7);transition:height .3s cubic-bezier(.2,.8,.2,1)}
 .handle{width:36px;height:4px;background:var(--b3);border-radius:99px;margin:10px auto 0;flex-shrink:0;cursor:pointer}
 
 /* TABS INTERNES AU SHEET */
@@ -186,9 +186,9 @@ textarea:focus{border-color:var(--b3)}
 .nearby-dist span{display:block;font-size:9px;color:var(--ink3);font-weight:400;margin-top:1px}
 
 /* TAP-TO-ROUTE */
-.tap-card{position:fixed;left:12px;right:12px;z-index:150;background:var(--d1);border:1px solid var(--b2);border-radius:var(--r);padding:14px;box-shadow:0 -4px 32px rgba(0,0,0,.7);transform:translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s;pointer-events:none;bottom:calc(55vh + 52px + var(--sb) + 8px)}
+.tap-card{position:fixed;left:12px;right:12px;z-index:150;background:var(--d1);border:1px solid var(--b2);border-radius:var(--r);padding:14px;box-shadow:0 -4px 32px rgba(0,0,0,.7);transform:translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s;pointer-events:none;bottom:calc(42vh + 52px + var(--sb) + 8px)}
 .tap-card.on{transform:translateY(0);opacity:1;pointer-events:all}
-.tap-hint{position:fixed;left:50%;transform:translateX(-50%);z-index:150;background:var(--d3);border:1px solid var(--b3);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--blue);font-weight:600;backdrop-filter:blur(16px);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;bottom:calc(55vh + 52px + var(--sb) + 14px)}
+.tap-hint{position:fixed;left:50%;transform:translateX(-50%);z-index:150;background:var(--d3);border:1px solid var(--b3);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--blue);font-weight:600;backdrop-filter:blur(16px);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;bottom:calc(42vh + 52px + var(--sb) + 14px)}
 .tap-hint.on{opacity:1}
 
 /* STATES */
@@ -794,7 +794,7 @@ function goPanel(name) {
 
 function toggleSheet() {
   sheetExpanded = !sheetExpanded;
-  document.getElementById('sheet').style.height = sheetExpanded ? '72vh' : '55vh';
+  document.getElementById('sheet').style.height = sheetExpanded ? '65vh' : '42vh';
 }
 
 // ═══════════════════════════════════════
@@ -1022,7 +1022,7 @@ async function doRoute() {
     out.innerHTML = html + '</div>';
     renderJourneys(data, out, toVal, fc, tc, true /* append */);
     document.getElementById('opt-pills').style.display = 'flex';
-    if (!sheetExpanded) { sheetExpanded = true; document.getElementById('sheet').style.height = '72vh'; }
+    if (!sheetExpanded) { sheetExpanded = true; document.getElementById('sheet').style.height = '65vh'; }
   } catch (e) {
     out.innerHTML = `<div class="err">${e.message}</div>`;
   }
