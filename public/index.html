@@ -32,8 +32,8 @@
 html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit',sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;overflow:hidden;touch-action:manipulation}
 
 /* MAP */
-#map{position:fixed;inset:0;z-index:0;background:var(--bg)}
-.leaflet-tile-pane{filter:brightness(.42) saturate(.55) hue-rotate(205deg) invert(1) contrast(.88)}
+#map{position:fixed;inset:0;z-index:0;background:var(--bg);min-height:100px}
+.leaflet-tile-pane{filter:brightness(.45) saturate(.6) hue-rotate(200deg) invert(1) contrast(.9);will-change:filter}
 .leaflet-control-attribution,.leaflet-control-zoom{display:none}
 
 /* WORDMARK */
@@ -725,7 +725,33 @@ let stop2Id = null, stop2Name = null, stop2Timer = null, stop2Cd = null;
 // MAP INIT
 // ═══════════════════════════════════════
 const map = L.map('map', { center: [48.8566, 2.3522], zoom: 12, zoomControl: false, attributionControl: false });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+// Tiles avec fallback automatique
+const tileProviders = [
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+];
+let tileLayer = L.tileLayer(tileProviders[0], { maxZoom: 19 });
+let _tileProviderIdx = 0;
+tileLayer.on('tileerror', function() {
+  _tileProviderIdx++;
+  if (_tileProviderIdx < tileProviders.length) {
+    console.log('[Talaria] Tiles fallback →', tileProviders[_tileProviderIdx]);
+    this.setUrl(tileProviders[_tileProviderIdx]);
+  }
+});
+// Vérifier que les tiles chargent dans les 5s, sinon basculer
+setTimeout(() => {
+  const container = document.querySelector('.leaflet-tile-pane');
+  if (container && !container.querySelector('img[src*="openstreetmap"]')?.complete) {
+    if (_tileProviderIdx === 0) {
+      _tileProviderIdx = 1;
+      tileLayer.setUrl(tileProviders[1]);
+    }
+  }
+}, 5000);
+tileLayer.addTo(map);
+map.on('load', () => { setTimeout(() => map.invalidateSize(), 100); });
 
 map.on('click', e => {
   if (!tapActive) return;
@@ -805,7 +831,7 @@ function goPage(page) {
     mapEl.style.display = '';
     wm.style.display = 'flex';
     mapbtns.style.display = 'flex';
-    setTimeout(() => map.invalidateSize(), 60);
+    setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 100);
   } else {
     sheet.style.display = 'none';
     mapEl.style.display = 'none';
@@ -830,7 +856,7 @@ function goPanel(name) {
   if (stab) stab.classList.add('on');
   if (panel) panel.classList.add('on');
   if (name !== 'stop' && stopTimer) { clearInterval(stopTimer); stopTimer = null; }
-  setTimeout(() => map.invalidateSize(), 60);
+  setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 100);
 }
 
 function toggleSheet() {
@@ -1769,6 +1795,10 @@ document.getElementById('stopQ2').addEventListener('keydown', e => { if (e.key =
 
 // Géoloc carte
 centerUser();
+// Forcer le rendu de la carte après chargement complet
+window.addEventListener('load', () => {
+  setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 300);
+});
 
 // ═══════════════════════════════════════════════════════════
 // API 1 : OPEN-METEO — Météo temps réel + alertes impact
