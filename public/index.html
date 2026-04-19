@@ -67,7 +67,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit'
 .pg-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 16px calc(16px + var(--sb))}
 
 /* SHEET — position au dessus de la tabbar */
-.sheet{position:fixed;bottom:calc(52px + var(--sb));left:0;right:0;z-index:100;display:flex;flex-direction:column;height:55vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7);transition:height .3s cubic-bezier(.2,.8,.2,1)}
+.sheet{position:fixed;bottom:calc(52px + var(--sb));left:0;right:0;z-index:100;display:flex;flex-direction:column;height:42vh;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;box-shadow:0 -12px 60px rgba(0,0,0,.7);transition:height .3s cubic-bezier(.2,.8,.2,1)}
 .handle{width:36px;height:4px;background:var(--b3);border-radius:99px;margin:10px auto 0;flex-shrink:0;cursor:pointer}
 
 /* TABS INTERNES AU SHEET */
@@ -186,9 +186,9 @@ textarea:focus{border-color:var(--b3)}
 .nearby-dist span{display:block;font-size:9px;color:var(--ink3);font-weight:400;margin-top:1px}
 
 /* TAP-TO-ROUTE */
-.tap-card{position:fixed;left:12px;right:12px;z-index:150;background:var(--d1);border:1px solid var(--b2);border-radius:var(--r);padding:14px;box-shadow:0 -4px 32px rgba(0,0,0,.7);transform:translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s;pointer-events:none;bottom:calc(55vh + 52px + var(--sb) + 8px)}
+.tap-card{position:fixed;left:12px;right:12px;z-index:150;background:var(--d1);border:1px solid var(--b2);border-radius:var(--r);padding:14px;box-shadow:0 -4px 32px rgba(0,0,0,.7);transform:translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .3s;pointer-events:none;bottom:calc(42vh + 52px + var(--sb) + 8px)}
 .tap-card.on{transform:translateY(0);opacity:1;pointer-events:all}
-.tap-hint{position:fixed;left:50%;transform:translateX(-50%);z-index:150;background:var(--d3);border:1px solid var(--b3);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--blue);font-weight:600;backdrop-filter:blur(16px);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;bottom:calc(55vh + 52px + var(--sb) + 14px)}
+.tap-hint{position:fixed;left:50%;transform:translateX(-50%);z-index:150;background:var(--d3);border:1px solid var(--b3);border-radius:99px;padding:7px 16px;font-size:12px;color:var(--blue);font-weight:600;backdrop-filter:blur(16px);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .3s;bottom:calc(42vh + 52px + var(--sb) + 14px)}
 .tap-hint.on{opacity:1}
 
 /* STATES */
@@ -222,6 +222,145 @@ textarea:focus{border-color:var(--b3)}
 
 /* NOTIF PERMISSION */
 .notif-perm{background:var(--bluedim);border:1px solid rgba(68,136,255,.2);border-radius:var(--r);padding:13px 14px;margin-bottom:12px;display:flex;align-items:center;gap:11px}
+
+
+/* STOP MARKERS SUR CARTE */
+.sm-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+.sm-pin{width:36px;height:36px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.6)}
+.leaflet-marker-icon .sm-wrap{pointer-events:auto}
+.sm-pin.METRO{background:#4488ff}.sm-pin.RER{background:#a855f7}.sm-pin.BUS{background:#ff6b35}.sm-pin.TRAM{background:#00d68f}.sm-pin.MIX{background:#222238}
+.sm-needle{width:2px;height:6px;background:rgba(255,255,255,.7);border-radius:1px}
+.sm-dist{font-size:9px;font-family:'JetBrains Mono',monospace;color:#fff;background:rgba(7,7,15,.85);padding:1px 5px;border-radius:4px;margin-top:1px;white-space:nowrap}
+
+/* POPUP ARRÊT (sheet bottom) */
+.stop-popup-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;transition:opacity .25s;pointer-events:none}
+.stop-popup-overlay.on{opacity:1;pointer-events:all}
+.stop-popup{position:fixed;bottom:calc(52px + var(--sb));left:0;right:0;z-index:410;background:var(--d1);border:1px solid var(--b2);border-bottom:none;border-radius:22px 22px 0 0;max-height:70vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.stop-popup.on{transform:translateY(0)}
+.stop-popup-handle{width:36px;height:4px;background:var(--b3);border-radius:99px;margin:10px auto 0;flex-shrink:0}
+.stop-popup-head{padding:12px 16px 10px;border-bottom:1px solid var(--b1);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.stop-popup-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px calc(12px + var(--sb))}
+
+
+/* ═══ ANIMATIONS STYLE FRAMER MOTION ═══ */
+
+/* Entrée slide-up avec fade — cartes itinéraires */
+@keyframes slideUpFade {
+  from { opacity:0; transform:translateY(22px) scale(.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+/* Entrée depuis la droite */
+@keyframes slideInRight {
+  from { opacity:0; transform:translateX(28px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+/* Entrée depuis le bas (pages) */
+@keyframes slideInUp {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+/* Scale pop (boutons, badges) */
+@keyframes scalePop {
+  0%   { transform:scale(.8);  opacity:0; }
+  60%  { transform:scale(1.06); opacity:1; }
+  100% { transform:scale(1);   opacity:1; }
+}
+/* Shimmer (skeleton loader) */
+@keyframes shimmer {
+  0%   { background-position:-400px 0; }
+  100% { background-position:400px 0; }
+}
+/* Pulse douce (indicateur heure de pointe) */
+@keyframes softPulse {
+  0%,100% { opacity:1; }
+  50%     { opacity:.55; }
+}
+/* Bounce léger (marqueurs carte) */
+@keyframes markerBounce {
+  0%   { transform:translateY(-18px) scale(.7); opacity:0; }
+  55%  { transform:translateY(4px) scale(1.05); opacity:1; }
+  75%  { transform:translateY(-3px) scale(.98); }
+  100% { transform:translateY(0) scale(1); }
+}
+/* Rotation douce (icône géoloc loading) */
+@keyframes rotateSmooth {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+/* Fade slide sheet panels */
+@keyframes panelIn {
+  from { opacity:0; transform:translateX(12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+/* Notification slide down */
+@keyframes notifIn {
+  from { transform:translateY(-110%); opacity:0; }
+  to   { transform:translateY(0);     opacity:1; }
+}
+/* Card open expand */
+@keyframes expandIn {
+  from { opacity:0; max-height:0; }
+  to   { opacity:1; max-height:600px; }
+}
+
+/* Classes utilitaires */
+.fm-slide-up    { animation: slideUpFade .38s cubic-bezier(.2,.8,.2,1) both; }
+.fm-slide-right { animation: slideInRight .32s cubic-bezier(.2,.8,.2,1) both; }
+.fm-slide-page  { animation: slideInUp .35s cubic-bezier(.2,.8,.2,1) both; }
+.fm-scale-pop   { animation: scalePop .35s cubic-bezier(.34,1.56,.64,1) both; }
+.fm-bounce-marker { animation: markerBounce .5s cubic-bezier(.34,1.2,.64,1) both; }
+
+/* Stagger delays pour listes */
+.fm-d1 { animation-delay:.05s }
+.fm-d2 { animation-delay:.10s }
+.fm-d3 { animation-delay:.15s }
+.fm-d4 { animation-delay:.20s }
+.fm-d5 { animation-delay:.25s }
+
+/* Boutons — feedback tactile */
+.btn-blue  { transition: opacity .15s, transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important; }
+.btn-blue:active  { transform:scale(.96) !important; }
+.btn-ghost { transition: opacity .15s, transform .12s, background .15s !important; }
+.btn-ghost:active { transform:scale(.96) !important; }
+.mapbtn    { transition: background .15s, transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important; }
+.mapbtn:active { transform:scale(.88) !important; }
+.tbb { transition: color .18s, transform .12s !important; }
+.tbb:active { transform:scale(.88) !important; }
+.stab { transition: color .15s, transform .1s !important; }
+.stab:active { transform:scale(.9) !important; }
+.depcard, .fav-card, .nearby-card { transition: transform .15s cubic-bezier(.2,.8,.2,1), border-color .2s, background .15s !important; }
+.depcard:active, .fav-card:active, .nearby-card:active { transform:scale(.98) !important; }
+.jcard { transition: border-color .2s, transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s !important; }
+.jcard:active { transform:scale(.99) !important; }
+
+/* Sheet — transition hauteur fluide */
+.sheet { transition: height .42s cubic-bezier(.2,.8,.2,1) !important; }
+
+/* Skeleton loader animé */
+.skeleton {
+  background: linear-gradient(90deg, var(--d3) 25%, var(--d4) 50%, var(--d3) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+
+/* Page transitions */
+.pg.on { animation: slideInUp .35s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Notif banner */
+.notif.show { animation: notifIn .38s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Popup arrêt */
+.stop-popup.on { transition: transform .38s cubic-bezier(.2,.8,.2,1) !important; }
+
+/* Tab indicator slide */
+.tbb.on::after { transition: left .2s cubic-bezier(.2,.8,.2,1), width .2s !important; }
+
+/* Rush banner pulse */
+#rush-banner { animation: softPulse 2.5s ease infinite; }
+
+/* Tap card */
+.tap-card.on { animation: slideUpFade .35s cubic-bezier(.2,.8,.2,1) both; }
 
 /* ROUTE ANIMATED */
 @keyframes dashMove{to{stroke-dashoffset:-20}}
@@ -260,11 +399,11 @@ textarea:focus{border-color:var(--b3)}
     <div id="notif-title" style="font-size:13px;font-weight:700;color:var(--ink)"></div>
     <div id="notif-sub" style="font-size:11px;color:var(--ink2);margin-top:2px"></div>
   </div>
-  <button onclick="hideNotif()" style="width:28px;height:28px;background:var(--d4);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:12px;flex-shrink:0">✕</button>
+  <button onclick="hideNotif()" style="width:28px;height:28px;background:var(--d4);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:12px;flex-shrink:0">×</button>
 </div>
 
 <!-- TAP HINT -->
-<div class="tap-hint" id="tapHint">📍 Tapez une destination sur la carte</div>
+<div class="tap-hint" id="tapHint"style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> Tapez une destination sur la carte</div>
 
 <!-- TAP RESULT CARD -->
 <div class="tap-card" id="tapCard">
@@ -279,7 +418,7 @@ textarea:focus{border-color:var(--b3)}
   <div id="tapPills" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px"></div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-blue" style="flex:1;padding:11px;font-size:14px" onclick="tapToFull()">Détail complet →</button>
-    <button class="btn btn-ghost btn-sm" onclick="closeTap()">✕</button>
+    <button class="btn btn-ghost btn-sm" onclick="closeTap()">×</button>
   </div>
 </div>
 
@@ -304,7 +443,7 @@ textarea:focus{border-color:var(--b3)}
       <button class="refbtn" onclick="stop2Refresh()">↻ Actu.</button>
     </div>
     <div id="stop2-out">
-      <div class="empty"><div class="empty-i">🚏</div><p>Tapez le nom d'un arrêt pour voir les passages en temps réel</p></div>
+      <div class="empty"><div class="empty-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3"/></svg></div><p>Tapez le nom d'un arrêt pour voir les passages en temps réel</p></div>
     </div>
   </div>
 </div>
@@ -335,26 +474,26 @@ textarea:focus{border-color:var(--b3)}
     <div class="s-group">
       <div class="opt-row" id="opt-fastest" onclick="setOpt('fastest')">
         <div class="opt-dot" id="odot-fastest"></div>
-        <span style="font-size:14px;color:var(--ink2)">⚡ Le plus rapide</span>
+        <span style="font-size:14px;color:var(--ink2)" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Le plus rapide</span>
       </div>
       <div class="opt-row" id="opt-stress" onclick="setOpt('stress')">
         <div class="opt-dot" id="odot-stress"></div>
-        <span style="font-size:14px;color:var(--ink2)">😌 Moins de stress</span>
+        <span style="font-size:14px;color:var(--ink2)" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> Moins de stress</span>
       </div>
       <div class="opt-row" id="opt-crowd" onclick="setOpt('crowd')">
         <div class="opt-dot" id="odot-crowd"></div>
-        <span style="font-size:14px;color:var(--ink2)">🟢 Moins bondé</span>
+        <span style="font-size:14px;color:var(--ink2)" style="display:flex;align-items:center;gap:7px"><svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="#00d68f"/></svg> Moins bondé</span>
       </div>
     </div>
     <div class="s-label">Adresses</div>
     <div class="s-group">
       <div class="s-row">
-        <span style="font-size:14px;color:var(--ink)">🏠 Domicile</span>
+        <span style="font-size:14px;color:var(--ink)" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Domicile</span>
         <input type="text" id="homeAddr" placeholder="Adresse…" oninput="savePrefs()"
           style="background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink2);text-align:right;width:160px"/>
       </div>
       <div class="s-row">
-        <span style="font-size:14px;color:var(--ink)">💼 Travail</span>
+        <span style="font-size:14px;color:var(--ink)" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> Travail</span>
         <input type="text" id="workAddr" placeholder="Adresse…" oninput="savePrefs()"
           style="background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink2);text-align:right;width:160px"/>
       </div>
@@ -378,7 +517,7 @@ textarea:focus{border-color:var(--b3)}
 
   <!-- RUSH BANNER (injecté dynamiquement si rush hour) -->
   <div id="rush-banner" style="display:none;margin:6px 14px 0;padding:8px 12px;border-radius:10px;background:var(--orangedim);border:1px solid rgba(255,159,67,.25);color:var(--orange);font-size:12px;display:none;align-items:center;gap:8px;flex-shrink:0">
-    ⚠️ <span><strong>Heure de pointe</strong> — Affluence prévisible sur les grandes lignes</span>
+    <span style="display:flex;align-items:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> <span><strong>Heure de pointe</strong> — Affluence prévisible sur les grandes lignes</span>
   </div>
 
   <!-- TABS INTERNES -->
@@ -428,9 +567,9 @@ textarea:focus{border-color:var(--b3)}
       </div>
       <!-- Optimize pills -->
       <div id="opt-pills" style="display:none;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-        <button onclick="setOpt('fastest')" id="op-fastest" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600">⚡ Rapide</button>
-        <button onclick="setOpt('stress')" id="op-stress" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600">😌 Moins stress</button>
-        <button onclick="setOpt('crowd')" id="op-crowd" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600">🟢 Moins bondé</button>
+        <button onclick="setOpt('fastest')" id="op-fastest" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Rapide</button>
+        <button onclick="setOpt('stress')" id="op-stress" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> Stress</button>
+        <button onclick="setOpt('crowd')" id="op-crowd" style="padding:5px 10px;border-radius:99px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#00d68f"/></svg> Bondé</button>
       </div>
       <div id="route-out"></div>
     </div>
@@ -438,7 +577,7 @@ textarea:focus{border-color:var(--b3)}
     <!-- PANEL ARRÊT -->
     <div class="panel" id="panel-stop">
       <div id="notif-perm-block" class="notif-perm" style="display:none">
-        <span style="font-size:22px">🔔</span>
+        <span style="display:flex;align-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
         <div style="flex:1;font-size:12px;color:var(--ink2);line-height:1.5"><strong style="color:var(--blue);display:block;margin-bottom:2px">Recevoir des alertes</strong>Activez les notifications pour les retards.</div>
         <button class="btn btn-blue btn-sm" onclick="askNotif()">Activer</button>
       </div>
@@ -458,14 +597,14 @@ textarea:focus{border-color:var(--b3)}
     <!-- PANEL INCIDENT -->
     <div class="panel" id="panel-incident">
       <div class="inc-form">
-        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span style="font-size:17px">⚠️</span> Signaler un incident</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Signaler un incident</div>
         <div class="itypes" id="itypes">
-          <div class="itype" onclick="selType(this,'Retard')"><span style="font-size:20px">🕐</span>Retard</div>
-          <div class="itype" onclick="selType(this,'Suppression')"><span style="font-size:20px">🚫</span>Suppression</div>
-          <div class="itype" onclick="selType(this,'Affluence')"><span style="font-size:20px">👥</span>Affluence</div>
-          <div class="itype" onclick="selType(this,'Panne')"><span style="font-size:20px">🔧</span>Panne</div>
-          <div class="itype" onclick="selType(this,'Accident')"><span style="font-size:20px">🚨</span>Accident</div>
-          <div class="itype" onclick="selType(this,'Autre')"><span style="font-size:20px">💬</span>Autre</div>
+          <div class="itype" onclick="selType(this,'Retard')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Retard</div>
+          <div class="itype" onclick="selType(this,'Suppression')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span>Suppression</div>
+          <div class="itype" onclick="selType(this,'Affluence')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Affluence</div>
+          <div class="itype" onclick="selType(this,'Panne')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Panne</div>
+          <div class="itype" onclick="selType(this,'Accident')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Accident</div>
+          <div class="itype" onclick="selType(this,'Autre')"><span style="display:flex;align-items:center;justify-content:center;margin-bottom:3px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Autre</div>
         </div>
         <input type="text" id="incLine" placeholder="Ligne (ex: M13, RER B)" autocomplete="off"
           style="width:100%;height:44px;padding:0 12px;background:var(--d3);border:1px solid var(--b2);border-radius:var(--rsm);font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);outline:none;margin-bottom:8px;-webkit-appearance:none"/>
@@ -482,9 +621,9 @@ textarea:focus{border-color:var(--b3)}
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="background:var(--d2);border:1px solid var(--b2);border-radius:var(--r);padding:13px 14px;font-size:13px;color:var(--ink2);line-height:1.6">
           <strong style="color:var(--ink);display:block;margin-bottom:3px">Choisir sur la carte</strong>
-          Activez le bouton 📍 (carte) puis tapez n'importe où pour calculer l'itinéraire depuis votre position.
+          Activez le bouton <strong>⊙</strong> (carte) puis tapez n'importe où pour calculer l'itinéraire depuis votre position.
         </div>
-        <button class="btn btn-blue" onclick="centerUser()">📍 Me localiser</button>
+        <button class="btn btn-blue" onclick="centerUser()" style="display:flex;align-items:center;justify-content:center;gap:7px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> Me localiser</button>
         <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);text-align:center;margin-top:2px">© OpenStreetMap · IDFM PRIM</div>
       </div>
     </div>
@@ -655,7 +794,7 @@ function goPanel(name) {
 
 function toggleSheet() {
   sheetExpanded = !sheetExpanded;
-  document.getElementById('sheet').style.height = sheetExpanded ? '72vh' : '55vh';
+  document.getElementById('sheet').style.height = sheetExpanded ? '65vh' : '42vh';
 }
 
 // ═══════════════════════════════════════
@@ -719,9 +858,10 @@ function swapInputs() {
 function getCrowd(line, hour) {
   const rush = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
   const busy = ['14', '13', 'A', 'B', '1', '4'].some(l => (line || '').includes(l));
-  if (rush && busy) return { dot: '🔴', label: 'Bondé', color: '#ff4757', score: 3 };
-  if (rush || busy) return { dot: '🟡', label: 'Modéré', color: '#ff9f43', score: 2 };
-  return { dot: '🟢', label: 'Calme', color: '#00d68f', score: 1 };
+  const dot = c => `<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="${c}"/></svg>`;
+  if (rush && busy) return { dot: dot('#ff4757'), label: 'Bondé', color: '#ff4757', score: 3 };
+  if (rush || busy) return { dot: dot('#ff9f43'), label: 'Modéré', color: '#ff9f43', score: 2 };
+  return { dot: dot('#00d68f'), label: 'Calme', color: '#00d68f', score: 1 };
 }
 
 function predictDelay(line, hour) {
@@ -753,7 +893,7 @@ function acF(inp, key) {
     list.innerHTML = res.map(r => {
       const n = r.display_name.split(',').slice(0, 2).join(', ');
       const lat = parseFloat(r.lat), lon = parseFloat(r.lon);
-      return `<div class="aci" onclick="pickAc('${key}','${n.replace(/'/g, "\\'")}',${lat},${lon})">📍 ${n}</div>`;
+      return `<div class="aci" onclick="pickAc('${key}','${n.replace(/'/g, "\\'")}',${lat},${lon})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> ${n}</div>`;
     }).join('');
     list.style.display = 'block';
   }, 380);
@@ -783,15 +923,15 @@ function geoFrom() {
     userPos = { lat, lon };
     fromCoordStored = { lat, lon };
     const label = await reverseGeo(lat, lon);
-    document.getElementById('from').value = label;
+    document.getElementById('from').value = (label && label.trim().length > 2) ? label : 'Ma position';
     map.setView([lat, lon], 14);
     if (uMarker) map.removeLayer(uMarker);
     uMarker = L.circleMarker([lat, lon], { radius: 9, fillColor: '#4488ff', fillOpacity: 1, color: '#fff', weight: 2.5 }).addTo(map);
-    showNotif('📍', 'Position détectée', label, 2500);
+    showNotif('pos', 'Position détectée', label, 2500);
   }, err => {
     dot.style.animation = '';
     const msgs = { 1: 'Accès refusé.', 2: 'Position non disponible.', 3: 'Délai dépassé.' };
-    showNotif('🔕', 'Géolocalisation', msgs[err.code] || 'Erreur.');
+    showNotif('off', 'Géolocalisation', msgs[err.code] || 'Erreur.');
   }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
 }
 
@@ -800,29 +940,96 @@ function geoFrom() {
 // ═══════════════════════════════════════
 window._journeys = [];
 
+// Distance à vol d'oiseau en mètres
+function distM(lat1,lon1,lat2,lon2){
+  const R=6371000,dL=(lat2-lat1)*Math.PI/180,dO=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dO/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+// Carte statique du trajet à pied sur la carte
+function drawWalkRoute(fc, tc) {
+  clearMap();
+  const coords = [[fc.lat, fc.lon],[tc.lat, tc.lon]];
+  const l = L.polyline(coords, { color:'#00d68f', weight:4, dashArray:'6 10', lineCap:'round', opacity:.9 }).addTo(map);
+  rLayers.push(l);
+  const mA = L.circleMarker([fc.lat,fc.lon],{radius:9,fillColor:'#4488ff',fillOpacity:1,color:'#fff',weight:2.5}).bindTooltip('Départ',{permanent:true,direction:'top',offset:[0,-12]}).addTo(map);
+  const mB = L.circleMarker([tc.lat,tc.lon],{radius:9,fillColor:'#ff4757',fillOpacity:1,color:'#fff',weight:2.5}).bindTooltip('Arrivée',{permanent:true,direction:'top',offset:[0,-12]}).addTo(map);
+  rLayers.push(mA,mB);
+  map.fitBounds([[fc.lat,fc.lon],[tc.lat,tc.lon]],{padding:[60,40]});
+}
+
 async function doRoute() {
   const fromVal = document.getElementById('from').value.trim();
   const toVal = document.getElementById('to').value.trim();
   const out = document.getElementById('route-out');
   const btn = document.getElementById('routeBtn');
   if (!fromVal || !toVal) { out.innerHTML = '<div class="err">Renseignez départ et arrivée.</div>'; return; }
+  // Valider que les champs ne sont pas des placeholders vides type "."
+  if (fromVal.length <= 1 && !fromCoordStored) { out.innerHTML = '<div class="err">Activez la géolocalisation (bouton •) ou saisissez un départ.</div>'; return; }
   btn.disabled = true;
-  out.innerHTML = '<div class="loader"><div class="spin"></div>Calcul en cours…</div>';
+  showSkeletons(out);
   document.getElementById('opt-pills').style.display = 'none';
   try {
-    const fc = fromCoordStored || await geo(fromVal);
+    let fc = fromCoordStored;
+    if (!fc) {
+      if (fromVal.length <= 2) throw new Error('Départ invalide. Tapez • pour utiliser votre position.');
+      fc = await geo(fromVal);
+    }
     const tc = await geo(toVal);
+    const dist = distM(fc.lat, fc.lon, tc.lat, tc.lon);
+    const walkMin = Math.round(dist / 80); // ~80m/min à pied
+    const bikeMin = Math.round(dist / 250); // ~250m/min à vélo
+
+    // Récupérer les trajets en transport
     const data = await prim('journeys', { from: `${fc.lon};${fc.lat}`, to: `${tc.lon};${tc.lat}`, count: 5 });
-    renderJourneys(data, out, toVal);
+    const journeys = data.journeys || [];
+    const bestTransport = journeys.sort((a,b) => a.duration - b.duration)[0];
+    const bestTransportMin = bestTransport ? Math.round(bestTransport.duration / 60) : Infinity;
+
+    // Construire l'affichage
+    let html = '<div class="jlist">';
+
+    // Carte marche en premier si plus rapide ou distance < 2km
+    if (dist <= 2000 || walkMin <= bestTransportMin) {
+      const isWalkFastest = walkMin <= bestTransportMin;
+      html += `<div class="jcard${isWalkFastest ? ' best' : ''}" id="jcwalk" onclick="event.currentTarget.classList.toggle('open');drawWalkRoute({lat:${fc.lat},lon:${fc.lon}},{lat:${tc.lat},lon:${tc.lon}})">
+        <div class="jhead">
+          <div>
+            <div class="jdur">${walkMin} <span style="font-size:13px;font-weight:400;color:var(--ink2)">min</span></div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+              ${isWalkFastest ? '<span class="jbadge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Le plus rapide</span>' : ''}
+              <span style="font-size:10px;color:var(--green);background:rgba(0,214,143,.12);padding:2px 8px;border-radius:99px;font-family:'JetBrains Mono',monospace;font-weight:600"><svg width="8" height="8" viewBox="0 0 8 8" style="flex-shrink:0"><circle cx="4" cy="4" r="4" fill="#00d68f"/></svg> 0 corresp.</span>
+            </div>
+          </div>
+          <div class="jright">
+            <div style="margin-bottom:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="12" cy="5" r="1.5" fill="currentColor"/><path d="M9 19l1-5-2-3 3-4 2 3 3-1M16 19l-2-5"/></svg></div>
+            <div style="font-size:13px;font-weight:600;color:var(--ink)">${dist < 1000 ? dist + 'm' : (dist/1000).toFixed(1) + 'km'}</div>
+            <div style="font-size:11px;color:var(--green);margin-top:2px;font-weight:600">Zéro transport</div>
+          </div>
+        </div>
+        <div class="jpills"><span class="pill WALK">↑ À pied</span>${bikeMin < walkMin ? '<span class="pill WALK">' + bikeMin + ' min vélo</span>' : ''}</div>
+        <div class="jdetail">
+          <div class="jdetail-inner" style="padding:4px 0">
+            <div class="step"><div class="sicon WALK">↑</div><div><div class="sname">À pied jusqu'à destination</div><div class="ssub">${dist < 1000 ? dist + 'm' : (dist/1000).toFixed(1) + 'km'} — environ ${walkMin} min</div></div></div>
+            <button class="btn btn-ghost" style="margin-top:10px;font-size:13px;padding:10px" onclick="event.stopPropagation();drawWalkRoute({lat:${fc.lat},lon:${fc.lon}},{lat:${tc.lat},lon:${tc.lon}});goPage('home');goPanel('map')" style="display:flex;align-items:center;justify-content:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Voir sur la carte</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // Ensuite les trajets en transport
+    out.innerHTML = html + '</div>';
+    renderJourneys(data, out, toVal, fc, tc, true /* append */);
     document.getElementById('opt-pills').style.display = 'flex';
-    if (!sheetExpanded) { sheetExpanded = true; document.getElementById('sheet').style.height = '72vh'; }
+    if (!sheetExpanded) { sheetExpanded = true; document.getElementById('sheet').style.height = '65vh'; }
   } catch (e) {
     out.innerHTML = `<div class="err">${e.message}</div>`;
   }
   btn.disabled = false;
 }
 
-function renderJourneys(data, out, destName) {
+function renderJourneys(data, out, destName, fc, tc, append) {
   const hour = new Date().getHours();
   let list = (data.journeys || []).map(j => ({
     ...j,
@@ -843,7 +1050,7 @@ function renderJourneys(data, out, destName) {
       const mode = modeOf(s);
       if (mode === 'WALK' && s.duration < 90) return '';
       const code = s.display_informations?.label || s.display_informations?.code || '';
-      return `<span class="pill ${mode}">${mode === 'WALK' ? '🚶' : (code || mode)}</span>`;
+      return `<span class="pill ${mode}">${mode === 'WALK' ? '↑' : (code || mode)}</span>`;
     }).filter(Boolean).join('');
 
     const arr = fmtT(j.arrival_date_time), dep = fmtT(j.departure_date_time);
@@ -855,7 +1062,7 @@ function renderJourneys(data, out, destName) {
       return `<div class="step"><div class="sicon ${mode}">${mode === 'WALK' ? '↑' : code.slice(0, 3) || '●'}</div><div><div class="sname">${name}</div>${sub ? `<div class="ssub">${sub}</div>` : ''}<div class="sdur">${s2m(s.duration)}</div></div></div>`;
     }).join('');
 
-    const shareMsg = escQ(`🚇 J'arrive à ${arr} — ${s2m(j.duration)} depuis ${document.getElementById('from').value.trim()} vers ${destName} via Talaria`);
+    const shareMsg = escQ(`J'arrive à ${arr} — ${s2m(j.duration)} depuis ${document.getElementById('from').value.trim()} vers ${destName} via Talaria`);
     const crowdStyle = `color:${j._crowd.color}`;
 
     return `<div class="jcard${i === 0 ? ' best' : ''}" id="jc${i}" onclick="toggleJ('jc${i}')">
@@ -863,7 +1070,7 @@ function renderJourneys(data, out, destName) {
         <div>
           <div class="jdur">${s2m(j.duration).replace(' min', '')} <span style="font-size:13px;font-weight:400;color:var(--ink2)">min</span></div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-            ${i === 0 ? '<span class="jbadge">✓ Le plus rapide</span>' : ''}
+            ${i === 0 ? '<span class="jbadge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Le plus rapide</span>' : ''}
             <span style="font-size:10px;${crowdStyle};background:${j._crowd.color}18;padding:2px 8px;border-radius:99px;font-family:\'JetBrains Mono\',monospace;font-weight:600">${j._crowd.dot} ${j._crowd.label}</span>
             ${j._delay > 0 ? `<span style="font-size:10px;color:var(--orange);font-weight:700">+${j._delay}min prévu</span>` : ''}
           </div>
@@ -874,26 +1081,33 @@ function renderJourneys(data, out, destName) {
           <div style="font-size:11px;color:var(--ink3);margin-top:2px">${j.nb_transfers ?? 0} corresp.</div>
         </div>
       </div>
-      <div class="jpills">${pills || '<span class="pill WALK">🚶 À pied</span>'}</div>
+      <div class="jpills">${pills || '<span class="pill WALK">À pied</span>'}</div>
       <div class="jdetail">
         <div class="jdetail-inner">
           ${steps}
           <div class="share-card">
-            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px">📤 Partager</div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:6px" style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Partager</div>
             <div class="share-btns">
               <button class="sbtn sbtn-wa" onclick="shareWA(event,'${shareMsg}')">WhatsApp</button>
               <button class="sbtn sbtn-sms" onclick="shareSMS(event,'${shareMsg}')">SMS</button>
               <button class="sbtn sbtn-copy" id="cp${i}" onclick="shareCopy(event,'${shareMsg}',${i})">Copier</button>
             </div>
           </div>
-          <button class="btn btn-ghost" style="margin-top:10px;font-size:13px;padding:10px" onclick="event.stopPropagation();drawRoute(window._journeys[${i}]);goPage('home');goPanel('map')">🗺 Voir sur la carte</button>
-          <button class="btn btn-ghost" style="margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();saveFav()">⭐ Sauvegarder ce trajet</button>
+          <button class="btn btn-ghost" style="margin-top:10px;font-size:13px;padding:10px" onclick="event.stopPropagation();drawRoute(window._journeys[${i}]);goPage('home');goPanel('map')" style="display:flex;align-items:center;justify-content:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Voir sur la carte</button>
+          <button class="btn btn-ghost" style="margin-top:6px;font-size:12px;padding:9px" onclick="event.stopPropagation();saveFav()" style="display:flex;align-items:center;justify-content:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Sauvegarder ce trajet</button>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  out.innerHTML = `<div class="jlist">${html}</div>`;
+  if (append) {
+    // Ajouter au contenu existant (après la carte marche)
+    const existing = out.querySelector('.jlist');
+    if (existing) { existing.innerHTML += html; }
+    else { out.innerHTML = `<div class="jlist">${html}</div>`; }
+  } else {
+    out.innerHTML = `<div class="jlist">${html}</div>`;
+  }
   updateOptUI();
 }
 
@@ -914,7 +1128,7 @@ function shareCopy(e, msg, idx) {
   e.stopPropagation();
   navigator.clipboard.writeText(msg).then(() => {
     const btn = document.getElementById('cp' + idx);
-    if (btn) { btn.textContent = '✓ Copié'; setTimeout(() => { btn.textContent = 'Copier'; }, 2000); }
+    if (btn) { btn.textContent = 'Copié'; setTimeout(() => { btn.textContent = 'Copier'; }, 2000); }
   });
 }
 
@@ -935,7 +1149,7 @@ function acStop(inp) {
       list.innerHTML = places.map(p => {
         const n = p.stop_area?.name || p.name, id = p.stop_area?.id || p.id;
         const lat = p.stop_area?.coord?.lat || 0, lon = p.stop_area?.coord?.lon || 0;
-        return `<div class="aci" onclick="pickStop('${n.replace(/'/g, "\\'")}','${id}',${lat},${lon})">🚏 ${n}</div>`;
+        return `<div class="aci" onclick="pickStop('${n.replace(/'/g, "\\'")}','${id}',${lat},${lon})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3"/></svg> ${n}</div>`;
       }).join('');
       list.style.display = 'block';
     } catch (e) { list.style.display = 'none'; }
@@ -972,34 +1186,154 @@ async function doStop() {
   btn.disabled = false;
 }
 
+// Marqueurs arrêts proches
+let nearbyMarkers = [];
+function clearNearby() { nearbyMarkers.forEach(m => map.removeLayer(m)); nearbyMarkers = []; }
+
+function modeFromLines(stop) {
+  const modes = (stop.commercial_modes || []).map(m => (m.name || '').toUpperCase());
+  if (modes.some(m => m.includes('TRAM'))) return 'TRAM';
+  if (modes.some(m => m.includes('RER'))) return 'RER';
+  if (modes.some(m => m.includes('METRO') || m.includes('MÉTRO'))) return 'METRO';
+  return 'BUS';
+}
+
+function placeNearbyMarkers(stops, uLat, uLon) {
+  clearNearby();
+  stops.forEach(stop => {
+    const sLat = parseFloat(stop.coord?.lat || 0), sLon = parseFloat(stop.coord?.lon || 0);
+    if (!sLat || !sLon) return;
+    const dist = distM(uLat, uLon, sLat, sLon);
+    const mode = modeFromLines(stop);
+    const code = (stop.lines || [])[0]?.code || stop.name.slice(0, 2).toUpperCase();
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="sm-wrap">
+        <div class="sm-pin ${mode}">${code}</div>
+        <div class="sm-needle"></div>
+        <div class="sm-dist">${dist < 1000 ? dist + 'm' : (dist/1000).toFixed(1) + 'km'}</div>
+      </div>`,
+      iconSize: [50, 58], iconAnchor: [25, 58]
+    });
+    const m = L.marker([sLat, sLon], { icon })
+      .addTo(map)
+      .on('click', () => openStopPopup(stop.id || stop.stop_area_id, stop.name, uLat, uLon, dist));
+    nearbyMarkers.push(m);
+  });
+}
+
+async function openStopPopup(stopId, stopName, uLat, uLon, dist) {
+  const ov = document.getElementById('stopPopupOv');
+  const popup = document.getElementById('stopPopup');
+  const body = document.getElementById('spopBody');
+  document.getElementById('spopName').textContent = stopName;
+  const distLabel = dist < 1000 ? dist + 'm' : (dist/1000).toFixed(1) + 'km';
+  document.getElementById('spopDist').textContent = distLabel + ' · ~' + Math.round(dist/80) + ' min à pied';
+  body.innerHTML = '<div class="loader"><div class="spin"></div>Chargement des passages…</div>';
+  ov.classList.add('on'); popup.classList.add('on');
+  try {
+    const data = await prim(`stop_areas/${encodeURIComponent(stopId)}/departures`, { count: 15, duration: 5400 });
+    renderDep(data, body, stopName, stopId);
+    // Patcher le bouton ↻ pour rester dans le popup
+    const refbtn = body.querySelector('.refbtn');
+    if (refbtn) refbtn.onclick = async () => {
+      const data2 = await prim(`stop_areas/${encodeURIComponent(stopId)}/departures`, { count: 15, duration: 5400 });
+      renderDep(data2, body, stopName, stopId);
+    };
+  } catch (e) { body.innerHTML = `<div class="err">${e.message}</div>`; }
+}
+
+function closeStopPopup() {
+  document.getElementById('stopPopupOv').classList.remove('on');
+  document.getElementById('stopPopup').classList.remove('on');
+}
+
 function doLocate() {
   const out = document.getElementById('stop-out'), lb = document.getElementById('locBtn');
   if (!navigator.geolocation) { out.innerHTML = '<div class="err">Géolocalisation non disponible.</div>'; return; }
-  out.innerHTML = '<div class="loader"><div class="spin"></div>Localisation…</div>';
-  lb.style.color = 'var(--blue)';
+  out.innerHTML = '<div class="loader"><div class="spin"></div>Localisation et recherche des arrêts…</div>';
+  lb.style.color = 'var(--green)';
   navigator.geolocation.getCurrentPosition(async pos => {
     lb.style.color = '';
     const lat = pos.coords.latitude, lon = pos.coords.longitude;
     userPos = { lat, lon };
-    map.setView([lat, lon], 15);
+
+    // Centrer la carte sur l'utilisateur
+    map.setView([lat, lon], 16);
     if (uMarker) map.removeLayer(uMarker);
     uMarker = L.circleMarker([lat, lon], { radius: 9, fillColor: '#4488ff', fillOpacity: 1, color: '#fff', weight: 2.5 }).addTo(map);
+
+    // Basculer vers home pour voir la carte avec les marqueurs
+    goPage('home');
+    goPanel('stop');
+
     try {
-      // Reverse geocode pour trouver le quartier → chercher arrêts
+      // Reverse geocode → nom de quartier → chercher arrêts proches
       const rv = await reverseGeo(lat, lon);
-      const q = rv.split(',')[0] || 'arrêt';
-      const d = await prim('places', { q, 'type[]': 'stop_area', count: 6 });
-      const pl = (d.places || []).find(p => p.embedded_type === 'stop_area');
-      if (!pl) throw new Error('Aucun arrêt trouvé à proximité.');
-      const name = pl.stop_area?.name || pl.name, id = pl.stop_area?.id || pl.id;
-      const coord = pl.stop_area || pl;
-      document.getElementById('stopQ').value = name; selStopId = id;
-      if (coord.coord) putStop(name, coord.coord.lat, coord.coord.lon);
-      if (stopTimer) { clearInterval(stopTimer); stopTimer = null; }
-      await loadDep(id, out, name);
-      stopTimer = setInterval(() => loadDep(id, out, name), 30000);
+      // Chercher avec plusieurs termes pour maximiser les résultats
+      let q = rv.split(',')[0].trim();
+      // Si le terme est trop court ou générique, utiliser le quartier/ville
+      if (q.length < 4) q = rv.split(',').slice(0, 2).join(' ').trim();
+      if (q.length < 4) q = 'gare';
+      let d;
+      try {
+        d = await prim('places', { q, 'type[]': 'stop_area', count: 8 });
+        // Si pas de résultats, retry avec terme plus court
+        if (!(d.places || []).filter(p => p.embedded_type === 'stop_area').length) {
+          const q2 = q.split(' ').slice(-1)[0]; // dernier mot
+          if (q2.length > 3) d = await prim('places', { q: q2, 'type[]': 'stop_area', count: 8 });
+        }
+      } catch(e) { d = { places: [] }; }
+      const places = (d.places || []).filter(p => p.embedded_type === 'stop_area');
+      if (!places.length) throw new Error('Aucun arrêt trouvé à proximité.');
+
+      // Construire liste triée par distance
+      const stops = places.map(p => {
+        const sa = p.stop_area || p;
+        return { ...sa, id: sa.id || p.id };
+      }).filter(s => s.coord?.lat && s.coord?.lon)
+        .sort((a, b) => distM(lat, lon, parseFloat(a.coord.lat), parseFloat(a.coord.lon)) - distM(lat, lon, parseFloat(b.coord.lat), parseFloat(b.coord.lon)));
+
+      // Placer les marqueurs sur la carte
+      placeNearbyMarkers(stops, lat, lon);
+
+      // Afficher la liste dans le panel
+      const closest = stops[0];
+      const closestDist = distM(lat, lon, parseFloat(closest.coord.lat), parseFloat(closest.coord.lon));
+
+      const listHtml = stops.map(s => {
+        const sLat = parseFloat(s.coord.lat), sLon = parseFloat(s.coord.lon);
+        const d2 = distM(lat, lon, sLat, sLon);
+        const mode = modeFromLines(s);
+        const modeIcons = {
+        METRO: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/><path d="M9 6h6M9 10h6"/></svg>',
+        RER:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><circle cx="8.5" cy="14" r="1.5"/><circle cx="15.5" cy="14" r="1.5"/><path d="M8.5 16h7"/></svg>',
+        TRAM:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M4 12h16M8 6V4M16 6V4M8 18l-2 2M16 18l2 2"/><circle cx="8.5" cy="14.5" r="1"/><circle cx="15.5" cy="14.5" r="1"/></svg>',
+        BUS:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6v6M3 6h18l1 12H2L3 6z"/><path d="M2 12h20"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+      };
+        const lines = (s.lines || []).slice(0, 4).map(l => l.code || l.name).join(', ') || mode;
+        return `<div class="nearby-card" onclick="openStopPopup('${s.id}','${s.name.replace(/'/g,"\'")}',${lat},${lon},${d2});document.getElementById('stopQ').value='${s.name.replace(/'/g,"\'")}';selStopId='${s.id}'">
+          <div class="nearby-icon">${modeIcons[mode] || '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3"/></svg>'}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:2px">${lines}</div>
+          </div>
+          <div class="nearby-dist">${d2 < 1000 ? d2 + 'm' : (d2/1000).toFixed(1) + 'km'}<span>~${Math.round(d2/80)} min</span></div>
+        </div>`;
+      }).join('');
+
+      out.innerHTML = `
+        <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">
+          ${stops.length} arrêts · Tap sur la carte ou sur un arrêt
+        </div>
+        ${listHtml}`;
+
+      // Auto-ouvrir le plus proche
+      await openStopPopup(closest.id, closest.name, lat, lon, closestDist);
+
     } catch (e) { out.innerHTML = `<div class="err">${e.message}</div>`; }
-  }, () => { lb.style.color = ''; out.innerHTML = '<div class="err">Position inaccessible.</div>'; }, { enableHighAccuracy: true, timeout: 10000 });
+
+  }, () => { lb.style.color = ''; out.innerHTML = '<div class="err">Position inaccessible. Vérifiez les autorisations.</div>'; }, { enableHighAccuracy: true, timeout: 10000 });
 }
 
 async function loadDep(stopId, container, name) {
@@ -1069,7 +1403,7 @@ function acStop2(inp) {
       if (!places.length) { list.style.display = 'none'; return; }
       list.innerHTML = places.map(p => {
         const n = p.stop_area?.name || p.name, id = p.stop_area?.id || p.id;
-        return `<div class="aci" onclick="stop2Select('${n.replace(/'/g, "\\'")}','${id}')">🚏 ${n}</div>`;
+        return `<div class="aci" onclick="stop2Select('${n.replace(/'/g, "\\'")}','${id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3"/></svg> ${n}</div>`;
       }).join('');
       list.style.display = 'block';
     } catch (e) { list.style.display = 'none'; }
@@ -1120,17 +1454,24 @@ function submitInc() {
   incidents.unshift(inc); if (incidents.length > 20) incidents.length = 20;
   localStorage.setItem('talaria_inc', JSON.stringify(incidents));
   renderInc();
-  fb.innerHTML = '<div class="ok-msg">✓ Incident signalé !</div>';
+  fb.innerHTML = '<div class="ok-msg">Incident signalé !</div>';
   setTimeout(() => { fb.innerHTML = ''; }, 3000);
   selTypeVal = ''; document.querySelectorAll('.itype').forEach(t => t.classList.remove('sel'));
   document.getElementById('incLine').value = ''; document.getElementById('incDesc').value = '';
-  showNotif('⚠️', 'Incident signalé', `${inc.type} — ${inc.line}`);
+  showNotif('warn', 'Incident signalé', `${inc.type} — ${inc.line}`);
 }
 
 function renderInc() {
   const el = document.getElementById('inc-list');
-  if (!incidents.length) { el.innerHTML = '<div class="empty"><div class="empty-i">🔍</div><p>Aucun signalement.</p></div>'; return; }
-  const icons = { Retard: '🕐', Suppression: '🚫', Affluence: '👥', Panne: '🔧', Accident: '🚨', Autre: '💬' };
+  if (!incidents.length) { el.innerHTML = '<div class="empty"><div class="empty-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><p>Aucun signalement.</p></div>'; return; }
+  const icons = {
+    Retard:     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    Suppression:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+    Affluence:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    Panne:      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+    Accident:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    Autre:      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  };
   el.innerHTML = incidents.map(inc => `<div class="inc-card"><div class="inc-icon">${icons[inc.type] || '⚠️'}</div><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase">${inc.type} · ${inc.line}</div>${inc.desc ? `<div style="font-size:12px;color:var(--ink2);margin-top:2px">${inc.desc}</div>` : ''}<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:4px">${inc.ts}</div></div></div>`).join('');
 }
 
@@ -1167,7 +1508,7 @@ async function handleMapTap(lat, lng) {
 
   // Reverse geocode
   const destLabel = await reverseGeo(lat, lng);
-  document.getElementById('tapDest').textContent = '📍 ' + destLabel;
+  document.getElementById('tapDest').textContent = destLabel;
 
   // Coordonnées de départ
   let fromLat, fromLon;
@@ -1194,9 +1535,9 @@ async function handleMapTap(lat, lng) {
       const mode = modeOf(s);
       if (mode === 'WALK' && s.duration < 90) return '';
       const code = s.display_informations?.label || '';
-      return `<span class="pill ${mode}">${mode === 'WALK' ? '🚶' : (code || mode)}</span>`;
+      return `<span class="pill ${mode}">${mode === 'WALK' ? '↑' : (code || mode)}</span>`;
     }).filter(Boolean).join('');
-    document.getElementById('tapPills').innerHTML = pills || '<span class="pill WALK">🚶 À pied</span>';
+    document.getElementById('tapPills').innerHTML = pills || '<span class="pill WALK">À pied</span>';
     drawRoute(best);
     // Remettre le marqueur destination (drawRoute efface tout)
     m.addTo(map);
@@ -1225,8 +1566,16 @@ function tapToFull() {
 // ═══════════════════════════════════════
 // NOTIFICATIONS
 // ═══════════════════════════════════════
+const NOTIF_ICONS = {
+  'pos':  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>',
+  'off':  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
+  'err':  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+  'ok':   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  'warn': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  'star': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+};
 function showNotif(icon, title, sub, duration = 4000) {
-  document.getElementById('notif-icon').textContent = icon;
+  document.getElementById('notif-icon').innerHTML = NOTIF_ICONS[icon] || icon;
   document.getElementById('notif-title').textContent = title;
   document.getElementById('notif-sub').textContent = sub;
   const n = document.getElementById('notif');
@@ -1236,12 +1585,12 @@ function showNotif(icon, title, sub, duration = 4000) {
 function hideNotif() { document.getElementById('notif').classList.remove('show'); }
 
 function askNotif() {
-  if (!('Notification' in window)) { showNotif('❌', 'Non supporté', 'Navigateur incompatible.'); return; }
+  if (!('Notification' in window)) { showNotif('err', 'Non supporté', 'Navigateur incompatible.'); return; }
   Notification.requestPermission().then(p => {
     if (p === 'granted') {
       document.getElementById('notif-perm-block').style.display = 'none';
-      showNotif('✅', 'Notifications activées', 'Vous recevrez les alertes.');
-    } else { showNotif('🔕', 'Refusé', 'Activez dans les réglages du navigateur.'); }
+      showNotif('ok', 'Notifications activées', 'Vous recevrez les alertes.');
+    } else { showNotif('off', 'Refusé', 'Activez dans les réglages du navigateur.'); }
   });
 }
 
@@ -1253,13 +1602,13 @@ function saveFav() {
   if (!from || !to) return;
   favorites = [{ id: Date.now(), fromLabel: from, toLabel: to }, ...favorites.filter(f => f.fromLabel !== from || f.toLabel !== to)].slice(0, 10);
   localStorage.setItem('talaria_favs', JSON.stringify(favorites));
-  showNotif('⭐', 'Favori ajouté', `${from} → ${to}`);
+  showNotif('star', 'Favori ajouté', `${from} → ${to}`);
 }
 
 function renderFavs() {
   const el = document.getElementById('favs-body');
   if (!el) return;
-  if (!favorites.length) { el.innerHTML = '<div class="empty"><div class="empty-i">⭐</div><p>Aucun favori. Sauvegardez vos trajets fréquents depuis l\'onglet Trajet.</p></div>'; return; }
+  if (!favorites.length) { el.innerHTML = '<div class="empty"><div class="empty-i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><p>Aucun favori. Sauvegardez vos trajets fréquents depuis l\'onglet Trajet.</p></div>'; return; }
   el.innerHTML = favorites.map(f => `
     <div class="fav-card" onclick="launchFav('${f.fromLabel.replace(/'/g, "\\'")}','${f.toLabel.replace(/'/g, "\\'")}')">
       <span style="font-size:22px">⭐</span>
@@ -1267,7 +1616,7 @@ function renderFavs() {
         <div style="font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.fromLabel}</div>
         <div style="font-size:12px;color:var(--ink3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">→ ${f.toLabel}</div>
       </div>
-      <button onclick="event.stopPropagation();removeFav(${f.id})" style="background:none;border:none;color:var(--ink3);cursor:pointer;padding:8px;font-size:15px">✕</button>
+      <button onclick="event.stopPropagation();removeFav(${f.id})" style="background:none;border:none;color:var(--ink3);cursor:pointer;padding:8px;font-size:15px">×</button>
     </div>`).join('');
 }
 
@@ -1293,14 +1642,17 @@ function renderAlerts() {
   if (!el) return;
   const h = new Date().getHours(), rush = (h >= 7 && h <= 9) || (h >= 17 && h <= 19);
   const lines = ['1', '4', '13', 'A', 'B', '7', '14', 'C'];
+  const svgAlert = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const svgAI = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>`;
+  const svgTip = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
   const preds = [
-    { icon: rush ? '🔴' : '🟢', title: rush ? 'Heure de pointe active' : 'Trafic fluide', body: rush ? 'Affluence accrue sur les lignes 13, A, B. Prévoir +5 à +10 min.' : 'Conditions de voyage normales. Bonne route !', color: rush ? '#ff9f43' : '#00d68f', time: 'Maintenant' },
-    { icon: '🤖', title: 'Prédiction IA — RER B', body: 'Retards fréquents entre 8h–9h30. Prévoir un départ anticipé.', color: '#4488ff', time: 'Prédiction' },
-    { icon: '💡', title: 'Conseil', body: h < 12 ? 'Évitez le Métro 4 direction Montrouge avant 9h30.' : 'La ligne 13 est souvent chargée entre 18h et 20h.', color: '#a855f7', time: 'Suggestion' }
+    { icon: svgAlert, title: rush ? 'Heure de pointe active' : 'Trafic fluide', body: rush ? 'Affluence accrue sur les lignes 13, A, B. Prévoir +5 à +10 min.' : 'Conditions de voyage normales. Bonne route !', color: rush ? '#ff9f43' : '#00d68f', time: 'Maintenant' },
+    { icon: svgAI, title: 'Prédiction IA — RER B', body: 'Retards fréquents entre 8h–9h30. Prévoir un départ anticipé.', color: '#4488ff', time: 'Prédiction' },
+    { icon: svgTip, title: 'Conseil', body: h < 12 ? 'Évitez le Métro 4 direction Montrouge avant 9h30.' : 'La ligne 13 est souvent chargée entre 18h et 20h.', color: '#a855f7', time: 'Suggestion' }
   ];
   el.innerHTML = `
     <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Affluence par ligne</div>
-    <div class="crowd-grid">${lines.map(line => { const c = getCrowd(line, h); return `<div class="crowd-cell"><div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${line.length <= 2 ? 'M' + line : 'RER ' + line.slice(-1)}</div><div style="font-size:11px;color:var(--ink3);margin-top:1px">${c.label}</div></div><span style="font-size:20px">${c.dot}</span></div>`; }).join('')}</div>
+    <div class="crowd-grid">${lines.map(line => { const c = getCrowd(line, h); return `<div class="crowd-cell"><div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${line.length <= 2 ? 'M' + line : 'RER ' + line.slice(-1)}</div><div style="font-size:11px;color:${c.color};margin-top:1px;font-weight:600">${c.label}</div></div><svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="${c.color}" opacity=".9"/></svg></div>`; }).join('')}</div>
     <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 10px">Prédictions IA</div>
     ${preds.map(a => `<div style="background:var(--d2);border:1px solid ${a.color}22;border-radius:14px;padding:13px 14px;margin-bottom:8px;display:flex;gap:11px"><div style="width:36px;height:36px;border-radius:9px;background:${a.color}18;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">${a.icon}</div><div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--ink)">${a.title}</span><span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3)">${a.time}</span></div><div style="font-size:12px;color:var(--ink2);line-height:1.5">${a.body}</div></div></div>`).join('')}`;
 }
@@ -1376,5 +1728,22 @@ document.getElementById('stopQ2').addEventListener('keydown', e => { if (e.key =
 // Géoloc carte
 centerUser();
 </script>
+
+<!-- STOP POPUP -->
+<div class="stop-popup-overlay" id="stopPopupOv" onclick="closeStopPopup()"></div>
+<div class="stop-popup" id="stopPopup">
+  <div class="stop-popup-handle"></div>
+  <div class="stop-popup-head">
+    <div>
+      <div id="spopName" style="font-size:16px;font-weight:700;color:var(--ink)"></div>
+      <div id="spopDist" style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--green);margin-top:2px"></div>
+    </div>
+    <button onclick="closeStopPopup()" style="width:30px;height:30px;background:var(--d3);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:13px">×</button>
+  </div>
+  <div class="stop-popup-body" id="spopBody">
+    <div class="loader"><div class="spin"></div>Chargement…</div>
+  </div>
+</div>
+
 </body>
 </html>
