@@ -1,4 +1,4 @@
-# Talaria 🛼
+# Talaria — Sandales ailées · Transport IDF
 
 > Transport Île-de-France — application mobile-first intelligente
 
