@@ -226,7 +226,8 @@ textarea:focus{border-color:var(--b3)}
 
 /* STOP MARKERS SUR CARTE */
 .sm-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
-.sm-pin{width:36px;height:36px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#fff}
+.sm-pin{width:36px;height:36px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.6)}
+.leaflet-marker-icon .sm-wrap{pointer-events:auto}
 .sm-pin.METRO{background:#4488ff}.sm-pin.RER{background:#a855f7}.sm-pin.BUS{background:#ff6b35}.sm-pin.TRAM{background:#00d68f}.sm-pin.MIX{background:#222238}
 .sm-needle{width:2px;height:6px;background:rgba(255,255,255,.7);border-radius:1px}
 .sm-dist{font-size:9px;font-family:'JetBrains Mono',monospace;color:#fff;background:rgba(7,7,15,.85);padding:1px 5px;border-radius:4px;margin-top:1px;white-space:nowrap}
@@ -922,7 +923,7 @@ function geoFrom() {
     userPos = { lat, lon };
     fromCoordStored = { lat, lon };
     const label = await reverseGeo(lat, lon);
-    document.getElementById('from').value = label;
+    document.getElementById('from').value = (label && label.trim().length > 2) ? label : 'Ma position';
     map.setView([lat, lon], 14);
     if (uMarker) map.removeLayer(uMarker);
     uMarker = L.circleMarker([lat, lon], { radius: 9, fillColor: '#4488ff', fillOpacity: 1, color: '#fff', weight: 2.5 }).addTo(map);
@@ -964,11 +965,17 @@ async function doRoute() {
   const out = document.getElementById('route-out');
   const btn = document.getElementById('routeBtn');
   if (!fromVal || !toVal) { out.innerHTML = '<div class="err">Renseignez départ et arrivée.</div>'; return; }
+  // Valider que les champs ne sont pas des placeholders vides type "."
+  if (fromVal.length <= 1 && !fromCoordStored) { out.innerHTML = '<div class="err">Activez la géolocalisation (bouton •) ou saisissez un départ.</div>'; return; }
   btn.disabled = true;
   showSkeletons(out);
   document.getElementById('opt-pills').style.display = 'none';
   try {
-    const fc = fromCoordStored || await geo(fromVal);
+    let fc = fromCoordStored;
+    if (!fc) {
+      if (fromVal.length <= 2) throw new Error('Départ invalide. Tapez • pour utiliser votre position.');
+      fc = await geo(fromVal);
+    }
     const tc = await geo(toVal);
     const dist = distM(fc.lat, fc.lon, tc.lat, tc.lon);
     const walkMin = Math.round(dist / 80); // ~80m/min à pied
@@ -1256,14 +1263,27 @@ function doLocate() {
     if (uMarker) map.removeLayer(uMarker);
     uMarker = L.circleMarker([lat, lon], { radius: 9, fillColor: '#4488ff', fillOpacity: 1, color: '#fff', weight: 2.5 }).addTo(map);
 
-    // Basculer vers la carte pour voir les marqueurs
-    goPage('home'); goPanel('stop');
+    // Basculer vers home pour voir la carte avec les marqueurs
+    goPage('home');
+    goPanel('stop');
 
     try {
       // Reverse geocode → nom de quartier → chercher arrêts proches
       const rv = await reverseGeo(lat, lon);
-      const q = rv.split(',')[0] || rv;
-      const d = await prim('places', { q, 'type[]': 'stop_area', count: 8 });
+      // Chercher avec plusieurs termes pour maximiser les résultats
+      let q = rv.split(',')[0].trim();
+      // Si le terme est trop court ou générique, utiliser le quartier/ville
+      if (q.length < 4) q = rv.split(',').slice(0, 2).join(' ').trim();
+      if (q.length < 4) q = 'gare';
+      let d;
+      try {
+        d = await prim('places', { q, 'type[]': 'stop_area', count: 8 });
+        // Si pas de résultats, retry avec terme plus court
+        if (!(d.places || []).filter(p => p.embedded_type === 'stop_area').length) {
+          const q2 = q.split(' ').slice(-1)[0]; // dernier mot
+          if (q2.length > 3) d = await prim('places', { q: q2, 'type[]': 'stop_area', count: 8 });
+        }
+      } catch(e) { d = { places: [] }; }
       const places = (d.places || []).filter(p => p.embedded_type === 'stop_area');
       if (!places.length) throw new Error('Aucun arrêt trouvé à proximité.');
 
