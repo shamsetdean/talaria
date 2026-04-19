@@ -767,12 +767,14 @@ function openFullRoute(){
 // ═══════════════════════════════
 let stopTimer=null;
 function goTab(n){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  // Gérer panels internes du sheet
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+n).classList.add('active');
-  document.getElementById('panel-'+n).classList.add('active');
+  const panel = document.getElementById('panel-'+n);
+  if(panel) panel.classList.add('active');
+  // Si on demande map, basculer sur home et afficher la carte
+  if(n==='map') switchPage('home');
   if(n!=='stop'&&stopTimer){clearInterval(stopTimer);stopTimer=null}
-  setTimeout(()=>map.invalidateSize(),60);
+  setTimeout(()=>{if(typeof map!=='undefined')map.invalidateSize()},60);
 }
 
 // ═══════════════════════════════
@@ -1238,7 +1240,7 @@ function submitIncident(){
   setTimeout(()=>{fb.innerHTML=''},3000);
   selType_val='';document.querySelectorAll('.itype').forEach(t=>t.classList.remove('sel'));
   document.getElementById('incLine').value='';document.getElementById('incDesc').value='';
-  document.getElementById('incBadge').style.display='block';
+  const _ib=document.getElementById('alertBadge')||document.getElementById('incBadge');if(_ib)_ib.style.display='block';
   showNotif('⚠️','Incident signalé',`${inc.type} — ${inc.line}`);
   if(line){
     const subj=encodeURIComponent(`[Talaria] Incident signalé : ${inc.type} - ${line}`);
@@ -1252,7 +1254,7 @@ function renderIncidents(){
   if(!incidents.length){el.innerHTML=`<div class="empty"><div class="empty-i">🔍</div><p>Aucun signalement pour le moment.</p></div>`;return}
   const icons={Retard:'🕐',Suppression:'🚫',Affluence:'👥',Panne:'🔧',Accident:'🚨',Autre:'💬'};
   el.innerHTML=incidents.map(inc=>`<div class="inc-card"><div class="inc-icon-wrap">${icons[inc.type]||'⚠️'}</div><div class="inc-info"><div class="inc-type">${inc.type} · ${inc.line}</div>${inc.desc?`<div class="inc-desc">${inc.desc}</div>`:''}<div class="inc-meta">${inc.ts}</div></div></div>`).join('');
-  if(incidents.length)document.getElementById('incBadge').style.display='block';
+  if(incidents.length)const _ib=document.getElementById('alertBadge')||document.getElementById('incBadge');if(_ib)_ib.style.display='block';
 }
 
 // ═══════════════════════════════
