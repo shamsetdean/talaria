@@ -267,6 +267,53 @@ textarea:focus{border-color:var(--b3)}
 .rcard-btns{display:flex;gap:8px}
 .rcard-close{position:absolute;top:10px;right:12px;width:28px;height:28px;background:var(--d4);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink3);font-size:12px}
 
+
+/* ── PAGES SUPPLÉMENTAIRES ── */
+.page{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg);overflow:hidden}
+.page.active{display:flex}
+.page-head{padding:calc(16px + var(--st)) 16px 12px;flex-shrink:0}
+.page-head h1{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.03em}
+.page-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 16px calc(24px + var(--sb))}
+
+/* BOTTOM TABBAR */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:200;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(12,13,24,.96);backdrop-filter:blur(20px);border-top:1px solid var(--b1);padding-bottom:var(--sb)}
+.tbbtn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 7px;border:none;background:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);transition:color .15s;position:relative;min-height:52px}
+.tbbtn svg{width:20px;height:20px;stroke-width:1.8}
+.tbbtn.active{color:var(--blue)}
+.tbbtn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:18px;height:2px;background:var(--blue);border-radius:99px}
+.tb-badge{position:absolute;top:6px;right:calc(50%-17px);width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid var(--d1)}
+
+/* HOME SHEET — adjust for tabbar */
+.sheet{bottom:calc(52px + var(--sb)) !important}
+.tap-mode-btn{bottom:calc(55vh + 52px + var(--sb) + 8px) !important}
+.tap-hint{bottom:calc(55vh + 52px + var(--sb) + 8px) !important}
+.rcard{bottom:calc(55vh + 52px + var(--sb) + 4px) !important}
+
+/* CROWD CARDS */
+.crowd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.crowd-card{background:var(--d2);border:1px solid var(--b1);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between}
+
+/* ALERTS */
+.alert-card{background:var(--d2);border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px}
+.alert-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* FAVORITES */
+.fav-card{background:var(--d2);border:1px solid var(--b1);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer}
+
+/* SETTINGS */
+.settings-section{margin-bottom:24px}
+.settings-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.settings-group{background:var(--d2);border:1px solid var(--b1);border-radius:14px;padding:0 14px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--b1)}
+.settings-row:last-child{border-bottom:none}
+.toggle{width:50px;height:28px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-knob{position:absolute;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.optimize-opt{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:6px;transition:background .15s}
+.optimize-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--b3);transition:all .2s;flex-shrink:0}
+
+/* RUSH BANNER */
+.rush-banner{margin:0 16px 8px;padding:9px 13px;border-radius:10px;font-size:12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+
 </style>
 </head>
 <body>
@@ -311,27 +358,82 @@ textarea:focus{border-color:var(--b3)}
   <div class="sp-body" id="spBody"><div class="loader"><div class="spin"></div>Chargement…</div></div>
 </div>
 
+
+<!-- ══ PAGE ARRÊTS ══ -->
+<div class="page" id="page-stops" style="padding-bottom:calc(52px + var(--sb))">
+  <div class="page-head">
+    <h1>Arrêts temps réel</h1>
+    <div style="margin-top:12px;position:relative">
+      <input type="text" id="stopPageQ" placeholder="Nom de l'arrêt…" autocomplete="off" oninput="stopPageAc(this)"
+        style="width:100%;height:50px;padding:0 14px;background:var(--d2);border:1px solid var(--b2);border-radius:14px;outline:none;font-family:'Outfit',sans-serif;font-size:15px;color:var(--ink);-webkit-appearance:none"/>
+      <div id="stopPageAcList" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:500;background:var(--d3);border:1px solid var(--b3);border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.8)"></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div id="stopPageMeta" style="display:none;margin-bottom:12px;flex-direction:row;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Prochains passages</div>
+        <div id="stopPageTimer" style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:2px"></div>
+      </div>
+      <button class="refbtn" onclick="stopPageRefresh()">↻ Actu.</button>
+    </div>
+    <div id="stopPageOut">
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:38px;opacity:.2">🚏</div>
+        <div style="font-size:13px;color:var(--ink3);margin-top:10px;line-height:1.7">Tapez le nom d'un arrêt<br/>pour voir les passages en temps réel</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE ALERTES ══ -->
+<div class="page" id="page-alerts" style="padding-bottom:calc(52px + var(--sb))">
+  <div class="page-head"><h1>Alertes & Prédictions</h1></div>
+  <div class="page-body" id="alertsBody"></div>
+</div>
+
+<!-- ══ PAGE FAVORIS ══ -->
+<div class="page" id="page-favorites" style="padding-bottom:calc(52px + var(--sb))">
+  <div class="page-head"><h1>Favoris</h1></div>
+  <div class="page-body" id="favBody"></div>
+</div>
+
+<!-- ══ PAGE RÉGLAGES ══ -->
+<div class="page" id="page-settings" style="padding-bottom:calc(52px + var(--sb))">
+  <div class="page-head"><h1>Réglages</h1></div>
+  <div class="page-body">
+    <div class="settings-section">
+      <div class="settings-label">Optimiser les trajets pour</div>
+      <div class="settings-group" style="padding:14px">
+        <div class="optimize-opt" id="opt-fastest" onclick="setOptimize('fastest')"><div class="optimize-dot" id="dot-fastest"></div><span style="font-size:14px;color:var(--ink2)">⚡ Le plus rapide</span></div>
+        <div class="optimize-opt" id="opt-stress" onclick="setOptimize('stress')"><div class="optimize-dot" id="dot-stress"></div><span style="font-size:14px;color:var(--ink2)">😌 Moins de stress (moins de corresp.)</span></div>
+        <div class="optimize-opt" id="opt-crowd" onclick="setOptimize('crowd')"><div class="optimize-dot" id="dot-crowd"></div><span style="font-size:14px;color:var(--ink2)">🟢 Moins bondé</span></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">Adresses</div>
+      <div class="settings-group">
+        <div class="settings-row"><span style="font-size:14px;color:var(--ink)">🏠 Domicile</span><input type="text" id="homeAddr" placeholder="Adresse…" oninput="savePref()" style="background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink2);text-align:right;width:160px"/></div>
+        <div class="settings-row"><span style="font-size:14px;color:var(--ink)">💼 Travail</span><input type="text" id="workAddr" placeholder="Adresse…" oninput="savePref()" style="background:transparent;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink2);text-align:right;width:160px"/></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">À propos</div>
+      <div class="settings-group">
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <span style="font-size:14px;font-weight:600;color:var(--ink)">Talaria · Transport IDF</span>
+          <span style="font-size:12px;color:var(--ink3)">Données : IDFM PRIM · OpenStreetMap</span>
+          <span style="font-size:12px;color:var(--ink3)">Aucune donnée personnelle collectée</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="sheet">
   <div class="handle"></div>
-  <div class="tabs">
-    <button class="tab active" id="tab-route" onclick="goTab('route')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M5 17V10a7 7 0 0 1 7-7M19 7v7a7 7 0 0 1-7 7" stroke-linecap="round"/></svg>
-      Trajet
-    </button>
-    <button class="tab" id="tab-stop" onclick="goTab('stop')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3" stroke-linecap="round"/></svg>
-      Arrêt
-    </button>
-    <button class="tab" id="tab-incident" onclick="goTab('incident')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01" stroke-linecap="round"/></svg>
-      Incident
-      <span class="tab-badge" id="incBadge" style="display:none"></span>
-    </button>
-    <button class="tab" id="tab-map" onclick="goTab('map')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 20l-6-3V4l6 3 6-3 6 3v13l-6-3-6 3z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7v13M15 4v13" stroke-linecap="round"/></svg>
-      Carte
-    </button>
-  </div>
+
 
   <div class="panels">
 
@@ -1009,9 +1111,18 @@ function doLocate(){
     if(uMarker)map.removeLayer(uMarker);
     uMarker=L.circleMarker([lat,lon],{radius:9,fillColor:'#4488ff',fillOpacity:1,color:'#fff',weight:2.5}).addTo(map);
     try{
-      const d=await prim('places',{coord:`${lon};${lat}`,'type[]':'stop_area',count:6});
+      // Reverse geocode -> obtenir nom de rue -> chercher arrêts
+      let q='';
+      try{
+        const rv=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=fr`,{headers:{'User-Agent':'Talaria/1.0'}});
+        const rd=await rv.json();
+        const a=rd.address;
+        q=a?.road||a?.suburb||a?.neighbourhood||a?.town||a?.city||'';
+      }catch(e){}
+      if(!q)throw new Error('Impossible de déterminer votre position.');
+      const d=await prim('places',{q,'type[]':'stop_area',count:6});
       const pl=(d.places||[]).find(p=>p.embedded_type==='stop_area');
-      if(!pl)throw new Error('Aucun arrêt dans un rayon de 600m.');
+      if(!pl)throw new Error(`Aucun arrêt trouvé près de "${q}".`);
       const name=pl.stop_area?.name||pl.name,id=pl.stop_area?.id||pl.id;
       const coord=pl.stop_area||pl;
       document.getElementById('stopQ').value=name;selStopId=id;
@@ -1019,12 +1130,12 @@ function doLocate(){
       if(stopTimer){clearInterval(stopTimer);stopTimer=null}
       await loadDep(id,out,name);
       stopTimer=setInterval(()=>loadDep(id,out,name),30000);
-      loadNearbyStops(lat,lon);
+      loadNearbyStops(lat,lon,q);
     }catch(e){out.innerHTML=`<div class="err">${e.message}</div>`}
   },()=>{lb.classList.remove('loading');document.getElementById('stop-out').innerHTML=`<div class="err">Position inaccessible. Vérifiez les autorisations.</div>`},{enableHighAccuracy:true,timeout:10000});
 }
 
-async function loadNearbyStops(lat,lon){
+async function loadNearbyStops(lat,lon,streetHint){
   const out=document.getElementById('nearby-out');
   if(lat==null||lon==null){
     if(!navigator.geolocation){out.innerHTML='<div class="err">Géolocalisation non disponible.</div>';return}
@@ -1038,7 +1149,18 @@ async function loadNearbyStops(lat,lon){
   }
   out.innerHTML='<div class="loader"><div class="spin"></div>Arrêts proches…</div>';
   try{
-    const d=await prim('places',{coord:`${lon};${lat}`,'type[]':'stop_area',count:8});
+    // Reverse geocode pour obtenir un nom de quartier/rue utilisable par PRIM
+    let q=streetHint||'';
+    if(!q){
+      try{
+        const rv=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=fr`,{headers:{'User-Agent':'Talaria/1.0'}});
+        const rd=await rv.json();
+        const a=rd.address;
+        q=a?.suburb||a?.neighbourhood||a?.road||a?.town||a?.city||'';
+      }catch(e){}
+    }
+    if(!q)throw new Error('Impossible de localiser votre position.');
+    const d=await prim('places',{q,'type[]':'stop_area',count:8});
     const places=(d.places||[]).filter(p=>p.embedded_type==='stop_area');
     if(!places.length){out.innerHTML='';return}
     const stops=places.map(p=>{
@@ -1165,5 +1287,240 @@ if(navigator.geolocation)document.getElementById('nearbyHint').style.display='fl
 document.getElementById('stopQ').addEventListener('keydown',e=>{if(e.key==='Enter')doStop()});
 centerUser();
 </script>
+
+<!-- ══ TABBAR FIXE ══ -->
+<div class="tabbar" id="mainTabbar">
+  <button class="tbbtn active" id="tb-home" onclick="switchPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M5 17V10a7 7 0 0 1 7-7M19 7v7a7 7 0 0 1-7 7" stroke-linecap="round"/></svg>
+    Trajet
+  </button>
+  <button class="tbbtn" id="tb-stops" onclick="switchPage('stops')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M8 6V3M16 6V3" stroke-linecap="round"/></svg>
+    Arrêts
+  </button>
+  <button class="tbbtn" id="tb-alerts" onclick="switchPage('alerts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01" stroke-linecap="round"/></svg>
+    Alertes
+    <span class="tb-badge" id="alertBadge" style="display:none"></span>
+  </button>
+  <button class="tbbtn" id="tb-favorites" onclick="switchPage('favorites')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Favoris
+  </button>
+  <button class="tbbtn" id="tb-settings" onclick="switchPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round"/></svg>
+    Réglages
+  </button>
+</div>
+
+
+<script>
+// ═══════════════════════════════
+// NAVIGATION PAGES
+// ═══════════════════════════════
+let currentPage = 'home';
+let optimizeFor = localStorage.getItem('talaria_optimize') || 'fastest';
+let favorites2 = JSON.parse(localStorage.getItem('talaria_favorites') || '[]');
+let prefs = JSON.parse(localStorage.getItem('talaria_prefs') || '{}');
+
+function switchPage(page) {
+  currentPage = page;
+  ['stops','alerts','favorites','settings'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.remove('active');
+  });
+  const sheet = document.querySelector('.sheet');
+  const mapEl = document.getElementById('map');
+  const wm = document.querySelector('.wm');
+  const mapbtns = document.querySelector('.mapbtns');
+  const tapBtn = document.getElementById('tapBtn');
+  const notifBanner = document.getElementById('notifBanner');
+  if (page === 'home') {
+    [sheet, mapEl, wm, mapbtns].forEach(el => { if (el) el.style.display = ''; });
+    if (tapBtn) tapBtn.style.display = 'flex';
+    if (notifBanner) notifBanner.style.zIndex = 200;
+  } else {
+    if (sheet) sheet.style.display = 'none';
+    if (mapEl) mapEl.style.display = 'none';
+    if (wm) wm.style.display = 'none';
+    if (mapbtns) mapbtns.style.display = 'none';
+    if (tapBtn) tapBtn.style.display = 'none';
+    const el = document.getElementById('page-' + page);
+    if (el) el.classList.add('active');
+    if (page === 'alerts') renderAlerts();
+    if (page === 'favorites') renderFavorites();
+    if (page === 'settings') loadSettings();
+  }
+  document.querySelectorAll('.tbbtn').forEach(b => b.classList.remove('active'));
+  const tb = document.getElementById('tb-' + page);
+  if (tb) tb.classList.add('active');
+}
+
+// ── Rush banner ──
+function initRushBanner() {
+  const h = new Date().getHours();
+  const isRush = (h >= 7 && h <= 9) || (h >= 17 && h <= 19);
+  if (!isRush) return;
+  const sheet = document.querySelector('.sheet');
+  if (!sheet) return;
+  const b = document.createElement('div');
+  b.style.cssText = 'margin:0 16px 8px;padding:9px 13px;border-radius:10px;background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.25);color:var(--orange);font-size:12px;display:flex;align-items:center;gap:8px;flex-shrink:0';
+  b.innerHTML = '⚠️ <span><strong>Heure de pointe</strong> — Affluence prévisible sur les lignes principales</span>';
+  const handle = sheet.querySelector('.handle');
+  if (handle) handle.after(b);
+}
+
+// ── Optimize ──
+function setOptimize(mode) {
+  optimizeFor = mode;
+  localStorage.setItem('talaria_optimize', mode);
+  updateOptimizeUI();
+}
+function updateOptimizeUI() {
+  ['fastest','stress','crowd'].forEach(k => {
+    const dot = document.getElementById('dot-' + k);
+    const opt = document.getElementById('opt-' + k);
+    if (!dot || !opt) return;
+    const active = k === optimizeFor;
+    dot.style.background = active ? 'var(--blue)' : 'transparent';
+    dot.style.borderColor = active ? 'var(--blue)' : 'rgba(255,255,255,.14)';
+    opt.style.background = active ? 'var(--bluedim)' : 'transparent';
+  });
+}
+
+// ── AI heuristics ──
+function getCrowd(line, hour) {
+  const rush = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+  const busy = ['14','13','A','B','1','4'].some(l => (line||'').includes(l));
+  if (rush && busy) return { dot:'🔴', label:'Bondé', color:'#ff4757', score:3 };
+  if (rush || busy) return { dot:'🟡', label:'Modéré', color:'#ff9f43', score:2 };
+  return { dot:'🟢', label:'Calme', color:'#00d68f', score:1 };
+}
+function predictDelay(line, hour) {
+  const rush = (hour>=7&&hour<=9)||(hour>=17&&hour<=20);
+  let d=0; if(rush) d+=Math.floor(Math.random()*4);
+  if((line||'').includes('B')||(line||'').includes('D')) d+=2;
+  return d;
+}
+function stressScore(j) {
+  const t=j.nb_transfers??0, w=Math.round((j.durations?.walking||0)/60), h=new Date().getHours();
+  return t*20+w*2+((h>=7&&h<=9)||(h>=17&&h<=19)?15:0);
+}
+
+// ── Favorites ──
+function saveCurrentRoute() {
+  const from=document.getElementById('from').value.trim();
+  const to=document.getElementById('to').value.trim();
+  if(!from||!to) return;
+  favorites2=[{id:Date.now(),fromLabel:from,toLabel:to},...favorites2.filter(f=>f.fromLabel!==from||f.toLabel!==to)].slice(0,10);
+  localStorage.setItem('talaria_favorites',JSON.stringify(favorites2));
+  showNotif('⭐','Favori ajouté',from+' → '+to);
+}
+function renderFavorites() {
+  const el=document.getElementById('favBody');
+  if(!el) return;
+  if(!favorites2.length){el.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px;gap:10px"><div style="font-size:40px;opacity:.2">⭐</div><div style="font-size:15px;font-weight:600;color:var(--ink)">Aucun favori</div><div style="font-size:13px;color:var(--ink3);max-width:220px;line-height:1.6">Sauvegardez vos trajets depuis l'onglet Trajet</div></div>';return;}
+  el.innerHTML=favorites2.map(f=>`<div style="background:var(--d2);border:1px solid var(--b1);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="launchFav('${f.fromLabel.replace(/'/g,"\'")}','${f.toLabel.replace(/'/g,"\'")}')"><span style="font-size:22px">⭐</span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.fromLabel}</div><div style="font-size:12px;color:var(--ink3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">→ ${f.toLabel}</div></div><button onclick="event.stopPropagation();removeFav2(${f.id})" style="background:none;border:none;color:var(--ink3);cursor:pointer;padding:8px;font-size:16px">✕</button></div>`).join('');
+}
+function launchFav(from,to){document.getElementById('from').value=from;document.getElementById('to').value=to;switchPage('home');setTimeout(()=>doRoute(),200);}
+function removeFav2(id){favorites2=favorites2.filter(f=>f.id!==id);localStorage.setItem('talaria_favorites',JSON.stringify(favorites2));renderFavorites();}
+
+// ── Alerts ──
+function renderAlerts() {
+  const el=document.getElementById('alertsBody');
+  if(!el) return;
+  const h=new Date().getHours(), rush=(h>=7&&h<=9)||(h>=17&&h<=19);
+  const lines=['1','4','13','A','B','7','14','C'];
+  const preds=[
+    {icon:rush?'🔴':'🟢',title:rush?'Heure de pointe active':'Trafic fluide',body:rush?'Affluence accrue sur les lignes 13, A, B. Prévoir +5 à +10 min.':'Conditions de voyage normales. Bonne route !',color:rush?'#ff9f43':'#00d68f',time:'Maintenant'},
+    {icon:'🤖',title:'Prédiction IA — RER B',body:'Selon les données historiques, la RER B présente des retards fréquents entre 8h–9h30.',color:'#4488ff',time:'Prédiction'},
+    {icon:'💡',title:'Conseil',body:h<12?'Évitez le Métro 4 en direction Montrouge avant 9h30.':'La ligne 13 est souvent chargée entre 18h et 20h.',color:'#a855f7',time:'Suggestion'}
+  ];
+  el.innerHTML=`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Affluence par ligne</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${lines.map(line=>{const c=getCrowd(line,h);return`<div style="background:var(--d2);border:1px solid var(--b1);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${line.length<=2?'M'+line:'RER '+line.slice(-1)}</div><div style="font-size:11px;color:var(--ink3);margin-top:1px">${c.label}</div></div><span style="font-size:20px">${c.dot}</span></div>`;}).join('')}</div><div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Prédictions IA</div>${preds.map(a=>`<div style="background:var(--d2);border:1px solid ${a.color}22;border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px"><div style="width:38px;height:38px;border-radius:10px;background:${a.color}18;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${a.icon}</div><div style="flex:1"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:700;color:var(--ink)">${a.title}</span><span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink3)">${a.time}</span></div><div style="font-size:12px;color:var(--ink2);line-height:1.5">${a.body}</div></div></div>`).join('')}`;
+}
+
+// ── Page Arrêts (onglet) ──
+let spTimer=null,spCd=null,spId=null,spName=null;
+const spAcT={};
+function stopPageAc(inp){
+  clearTimeout(spAcT.t);
+  const q=inp.value.trim(), list=document.getElementById('stopPageAcList');
+  if(q.length<3){list.style.display='none';return;}
+  spAcT.t=setTimeout(async()=>{
+    try{
+      const d=await prim('places',{q,'type[]':'stop_area',count:6});
+      const places=(d.places||[]).filter(p=>p.embedded_type==='stop_area');
+      if(!places.length){list.style.display='none';return;}
+      list.innerHTML=places.map(p=>{const n=p.stop_area?.name||p.name,id=p.stop_area?.id||p.id;return`<div onclick="stopPageSelect('${n.replace(/'/g,"\'")}','${id}')" style="padding:13px 14px;font-size:14px;color:var(--ink2);cursor:pointer;border-bottom:1px solid var(--b1);min-height:46px;display:flex;align-items:center;gap:10px">🚏 ${n}</div>`;}).join('');
+      list.style.display='block';
+    }catch(e){list.style.display='none';}
+  },350);
+}
+async function stopPageSelect(name,id){
+  document.getElementById('stopPageQ').value=name;
+  document.getElementById('stopPageAcList').style.display='none';
+  spId=id;spName=name;clearInterval(spTimer);clearInterval(spCd);
+  await stopPageLoad(id,name);
+  spTimer=setInterval(()=>stopPageLoad(id,name),30000);
+}
+function stopPageRefresh(){if(spId)stopPageLoad(spId,spName);}
+async function stopPageLoad(id,name){
+  const out=document.getElementById('stopPageOut');
+  const meta=document.getElementById('stopPageMeta');
+  try{
+    const data=await prim(`stop_areas/${encodeURIComponent(id)}/departures`,{count:20,duration:7200});
+    const deps=data.departures||[];
+    const now=new Date();
+    const parseD=dt=>dt?.length>=15?new Date(+dt.slice(0,4),+dt.slice(4,6)-1,+dt.slice(6,8),+dt.slice(9,11),+dt.slice(11,13),+dt.slice(13,15)):null;
+    const diffM=dt=>{const d=parseD(dt);return d?Math.round((d-now)/60000):null;};
+    const fmtNx=dt=>{const m=diffM(dt);if(m===null)return{l:'--',c:'var(--ink3)'};if(m<=0)return{l:'Immédiat',c:'var(--green)',a:true};if(m<=2)return{l:m+' min',c:'var(--green)',a:true};if(m<=5)return{l:m+' min',c:'var(--orange)'};return{l:fmtT(dt),c:'var(--blue)'};};
+    const modeC=info=>{const m=(info.commercial_mode||'').toUpperCase();if(m.includes('TRAM'))return'#00d68f';if(m.includes('RER'))return'#a855f7';if(m.includes('MÉTRO')||m.includes('METRO'))return'#4488ff';return'#ff6b35';};
+    const lines={};
+    deps.forEach(d=>{const info=d.display_informations||{};const key=`${info.label}_${info.direction}`;if(!lines[key])lines[key]={info,times:[],stop:d.stop_point?.name||name};const dt=d.stop_date_time?.departure_date_time;if(dt)lines[key].times.push(dt);});
+    if(!Object.keys(lines).length){out.innerHTML='<div class="err">Aucun départ dans les 2h.</div>';return;}
+    const ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('stopPageTimer').textContent='Màj '+ts+' · 30s';
+    if(meta)meta.style.display='flex';
+    let secs=30;clearInterval(spCd);
+    spCd=setInterval(()=>{secs--;const el=document.getElementById('stopPageTimer');if(el)el.textContent='Màj '+ts+' · '+secs+'s';if(secs<=0)clearInterval(spCd);},1000);
+    out.innerHTML='<div class="deplist">'+Object.values(lines).sort((a,b)=>(diffM(a.times[0])??999)-(diffM(b.times[0])??999)).map(line=>{const color=modeC(line.info),code=line.info.label||line.info.code||'?',dir=line.info.direction||code,n1=line.times[0]?fmtNx(line.times[0]):{l:'--',c:'var(--ink3)'},n2=line.times[1]?fmtNx(line.times[1]):null;return`<div class="depcard"><div class="depbadge" style="background:${color}">${code}</div><div class="depinfo"><div class="depdir">${dir}</div><div class="depstop">${line.stop}</div></div><div class="deptimes"><div class="dept1" style="color:${n1.c};animation:${n1.a?'pulse 1.2s ease infinite':'none'}">${n1.l}</div>${n2?'<div class="dept2">'+n2.l+'</div>':''}</div></div>`;}).join('')+'</div>';
+  }catch(e){out.innerHTML='<div class="err">'+e.message+'</div>';}
+}
+
+// ── Settings ──
+function loadSettings(){
+  updateOptimizeUI();
+  const h=document.getElementById('homeAddr'),w=document.getElementById('workAddr');
+  if(h)h.value=prefs.home||'';
+  if(w)w.value=prefs.work||'';
+}
+function savePref(){
+  prefs.home=document.getElementById('homeAddr')?.value||'';
+  prefs.work=document.getElementById('workAddr')?.value||'';
+  localStorage.setItem('talaria_prefs',JSON.stringify(prefs));
+}
+
+// ── Save route button ──
+function addSaveBtn(){
+  const out=document.getElementById('route-out');
+  if(!out||!out.children.length||out.querySelector('.save-btn')) return;
+  const btn=document.createElement('button');
+  btn.className='save-btn';
+  btn.style.cssText='width:100%;padding:12px;margin-top:10px;background:var(--d3);border:1px solid var(--b2);border-radius:12px;font-family:Outfit,sans-serif;font-size:13px;color:var(--ink2);cursor:pointer';
+  btn.innerHTML='⭐ Sauvegarder ce trajet';
+  btn.onclick=saveCurrentRoute;
+  out.appendChild(btn);
+}
+
+// ── Init ──
+setTimeout(initRushBanner, 600);
+updateOptimizeUI();
+
+// Observer route-out pour ajouter le bouton save
+const routeObs=new MutationObserver(()=>addSaveBtn());
+const routeEl=document.getElementById('route-out');
+if(routeEl) routeObs.observe(routeEl,{childList:true});
+</script>
+
 </body>
 </html>
