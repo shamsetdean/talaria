@@ -7,9 +7,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#07070f"/>
 <meta name="description" content="Talaria · Transport Île-de-France en temps réel"/>
-<link rel="manifest" href="manifest.json"/>
+<link rel="manifest" href="/manifest.json"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzA3MDgwZiIvPjxlbGxpcHNlIGN4PSIxNiIgY3k9IjIzIiByeD0iMTAiIHJ5PSIzLjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ0ODhmZiIgc3Ryb2tlLXdpZHRoPSIxLjgiLz48bGluZSB4MT0iMTEiIHkxPSIyMCIgeDI9IjExIiB5Mj0iMTUiIHN0cm9rZT0iIzQ0ODhmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSIxNiIgeTE9IjIwIiB4Mj0iMTYiIHkyPSIxMyIgc3Ryb2tlPSIjNDQ4OGZmIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjIxIiB5MT0iMjAiIHgyPSIyMSIgeTI9IjE1IiBzdHJva2U9IiM0NDg4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiAxOEMxIDEzIDAgOCA0IDZjMy0yIDUgMSA0IDUgMS00IDMtOCA3LTUtMiA0LTMgOS0yIDEzIiBmaWxsPSIjNDQ4OGZmIi8+PHBhdGggZD0iTTI2IDE4YzUtNSA2LTEwIDItMTItMy0yLTUgMS00IDUtMS00LTMtOC03LTUgMiA0IDMgOSAyIDEzIiBmaWxsPSIjNDQ4OGZmIi8+PC9zdmc+"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzA3MDgwZiIvPjxlbGxpcHNlIGN4PSIxNiIgY3k9IjIzIiByeD0iMTAiIHJ5PSIzLjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ0ODhmZiIgc3Ryb2tlLXdpZHRoPSIxLjgiLz48bGluZSB4MT0iMTEiIHkxPSIyMCIgeDI9IjExIiB5Mj0iMTUiIHN0cm9rZT0iIzQ0ODhmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSIxNiIgeTE9IjIwIiB4Mj0iMTYiIHkyPSIxMyIgc3Ryb2tlPSIjNDQ4OGZmIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PGxpbmUgeDE9IjIxIiB5MT0iMjAiIHgyPSIyMSIgeTI9IjE1IiBzdHJva2U9IiM0NDg4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNNiAxOEMxIDEzIDAgOCA0IDZjMy0yIDUgMSA0IDUgMS00IDMtOCA3LTUtMiA0LTMgOS0yIDEzIiBmaWxsPSIjNDQ4OGZmIi8+PHBhdGggZD0iTTI2IDE4YzUtNSA2LTEwIDItMTItMy0yLTUgMS00IDUtMS00LTMtOC03LTUgMiA0IDMgOSAyIDEzIiBmaWxsPSIjNDQ4OGZmIi8+PC9zdmc+"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
 <title>Talaria</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -876,25 +877,45 @@ async function prim(path, params = {}) {
   return r.json();
 }
 
+// Géocodage via API Adresse data.gouv.fr (BAN), proxifiée par /api/geocode.
+// Format de réponse : GeoJSON FeatureCollection (features[].geometry.coordinates = [lon, lat])
 async function geo(q) {
-  const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q + ', Île-de-France')}&accept-language=fr`, { headers: { 'User-Agent': 'Talaria/1.0' } });
+  const r = await fetch(`/api/geocode?op=search&limit=1&q=${encodeURIComponent(q)}`);
+  if (!r.ok) throw new Error(`Erreur géocodage (${r.status})`);
   const d = await r.json();
-  if (!d.length) throw new Error(`Lieu introuvable : "${q}"`);
-  return { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+  const f = (d.features || [])[0];
+  if (!f) throw new Error(`Lieu introuvable : "${q}"`);
+  const [lon, lat] = f.geometry.coordinates;
+  return { lat, lon };
 }
 
 async function geoSug(q) {
-  const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q + ', Île-de-France')}&accept-language=fr`, { headers: { 'User-Agent': 'Talaria/1.0' } });
-  if (!r.ok) return [];
-  return r.json();
+  try {
+    const r = await fetch(`/api/geocode?op=search&limit=5&q=${encodeURIComponent(q)}`);
+    if (!r.ok) return [];
+    const d = await r.json();
+    return (d.features || []).map(f => {
+      const [lon, lat] = f.geometry.coordinates;
+      const p = f.properties || {};
+      return {
+        label: p.label || p.name || '',
+        city:  p.city  || '',
+        postcode: p.postcode || '',
+        lat, lon,
+      };
+    });
+  } catch (e) { return []; }
 }
 
 async function reverseGeo(lat, lon) {
   try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=fr`, { headers: { 'User-Agent': 'Talaria/1.0' } });
+    const r = await fetch(`/api/geocode?op=reverse&lat=${lat}&lon=${lon}`);
+    if (!r.ok) throw new Error('reverse failed');
     const d = await r.json();
-    const a = d.address;
-    return a?.road ? (a.house_number ? `${a.house_number} ${a.road}` : a.road) : (a?.suburb || a?.neighbourhood || a?.town || a?.city || `${lat.toFixed(4)},${lon.toFixed(4)}`);
+    const f = (d.features || [])[0];
+    if (!f) return `${lat.toFixed(4)},${lon.toFixed(4)}`;
+    const p = f.properties || {};
+    return p.name || p.street || p.label || `${lat.toFixed(4)},${lon.toFixed(4)}`;
   } catch (e) { return `${lat.toFixed(4)},${lon.toFixed(4)}`; }
 }
 
@@ -925,20 +946,27 @@ function swapInputs() {
 // AI HEURISTICS
 // ═══════════════════════════════════════
 function getCrowd(line, hour) {
+  // Estimation indicative — pas de données temps réel d'affluence côté PRIM public.
+  // On affiche "estimé" pour ne pas tromper l'utilisateur.
   const rush = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
-  const busy = ['14', '13', 'A', 'B', '1', '4'].some(l => (line || '').includes(l));
+  const L = (line || '').toUpperCase().trim();
+  // Lignes historiquement les plus chargées en pointe
+  const heavyMetro = ['1','4','13','14'];
+  const heavyRER   = ['A','B'];
+  const isHeavy =
+    heavyMetro.some(l => L === l || L === 'M'+l) ||
+    heavyRER.some(l   => L === l || L === 'RER '+l);
   const dot = c => `<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="${c}"/></svg>`;
-  if (rush && busy) return { dot: dot('#ff4757'), label: 'Bondé', color: '#ff4757', score: 3 };
-  if (rush || busy) return { dot: dot('#ff9f43'), label: 'Modéré', color: '#ff9f43', score: 2 };
-  return { dot: dot('#00d68f'), label: 'Calme', color: '#00d68f', score: 1 };
+  if (rush && isHeavy)  return { dot: dot('#ff4757'), label: 'Affluence élevée (estim.)', color: '#ff4757', score: 3 };
+  if (rush || isHeavy)  return { dot: dot('#ff9f43'), label: 'Modérée (estim.)',           color: '#ff9f43', score: 2 };
+  return                       { dot: dot('#00d68f'), label: 'Calme (estim.)',             color: '#00d68f', score: 1 };
 }
 
-function predictDelay(line, hour) {
-  const rush = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 20);
-  let d = 0;
-  if (rush) d += Math.floor(Math.random() * 4);
-  if ((line || '').includes('B') || (line || '').includes('D')) d += 2;
-  return d;
+function predictDelay() {
+  // Désactivé : la version précédente retournait Math.random() — pas une prédiction.
+  // Pour afficher un retard réel, il faudra croiser aimed_arrival_time vs
+  // expected_arrival_time depuis les Stop Monitoring SIRI (PRIM /stop-monitoring).
+  return 0;
 }
 
 function stressScore(j) {
@@ -960,9 +988,9 @@ function acF(inp, key) {
     const res = await geoSug(q).catch(() => []);
     if (!res.length) { list.style.display = 'none'; return; }
     list.innerHTML = res.map(r => {
-      const n = r.display_name.split(',').slice(0, 2).join(', ');
-      const lat = parseFloat(r.lat), lon = parseFloat(r.lon);
-      return `<div class="aci" onclick="pickAc('${key}','${n.replace(/'/g, "\\'")}',${lat},${lon})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> ${n}</div>`;
+      const n = (r.label || '').replace(/'/g, "\\'");
+      const lat = r.lat, lon = r.lon;
+      return `<div class="aci" onclick="pickAc('${key}','${n}',${lat},${lon})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg> ${r.label}</div>`;
     }).join('');
     list.style.display = 'block';
   }, 380);
@@ -1828,8 +1856,8 @@ async function fetchWeather(lat, lon) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// API 2 : OPENAQ — Qualité de l'air
-// https://openaq.org/  (gratuit, sans clé)
+// API 2 : OPEN-METEO AIR QUALITY — Qualité de l'air (AQI européen)
+// https://open-meteo.com/en/docs/air-quality-api  (gratuit, sans clé)
 // ═══════════════════════════════════════════════════════════
 let aqiData = null;
 
@@ -1901,26 +1929,29 @@ let disruptions = [];
 
 async function fetchDisruptions() {
   try {
-    // Endpoint IDFM perturbations temps réel
-    const r = await fetch(
-      'https://prim.iledefrance-mobilites.fr/marketplace/disruptions_bulk/disruptions/v2',
-      { headers: { 'apiKey': '' } } // clé vide = données publiques disponibles via proxy
-    );
-    if (!r.ok) throw new Error('no disruptions');
+    // Passe par /api/prim qui ajoute la clé apikey côté serveur et CORS.
+    const r = await fetch('/api/prim?path=disruptions_bulk/disruptions/v2');
+    if (!r.ok) throw new Error('disruptions ' + r.status);
     const d = await r.json();
-    disruptions = (d.disruptions || []).slice(0, 10);
-  } catch(e) {
-    // Fallback : simuler des perturbations réalistes basées sur heure
-    const h = new Date().getHours();
-    const rush = (h >= 7 && h <= 9) || (h >= 17 && h <= 19);
-    if (rush) {
-      disruptions = [
-        { line: 'B', type: 'Retard', msg: 'Retards de 5 à 10 minutes en raison d'affluence exceptionnelle.', time: 'En cours' },
-        { line: '13', type: 'Affluence', msg: 'Trains bondés aux heures de pointe. Suivant conseillé.', time: 'En cours' },
-      ];
-    } else {
-      disruptions = [];
-    }
+    // Le format IDFM disruptions_bulk peut renvoyer 'disruptions' ou des objets SIRI.
+    // On normalise en un tableau plat avec les champs utilisés par renderDisruptions.
+    const raw = Array.isArray(d.disruptions) ? d.disruptions
+              : Array.isArray(d) ? d
+              : [];
+    disruptions = raw.slice(0, 20).map(x => {
+      // Champs IDFM v2
+      const title = x.title || (x.messages && x.messages[0] && (x.messages[0].text || x.messages[0].channel?.name)) || '';
+      const msg   = (x.messages && x.messages[0] && x.messages[0].text) || x.message || x.cause || title || 'Perturbation en cours';
+      const lineLabel =
+        (x.impactedObjects && x.impactedObjects[0] && (x.impactedObjects[0].name || x.impactedObjects[0].id))
+        || (x.impacted_objects && x.impacted_objects[0] && x.impacted_objects[0].pt_object && x.impacted_objects[0].pt_object.name)
+        || x.lineName || '';
+      const time = x.lastUpdate || x.updated_at || x.applicationPeriods?.[0]?.begin || 'En cours';
+      return { line: lineLabel, type: x.severity || x.cause || 'Perturbation', msg, time };
+    });
+  } catch (e) {
+    // Pas de fallback inventé : on n'affiche RIEN plutôt qu'une fausse info.
+    disruptions = [];
   }
 }
 
@@ -1930,14 +1961,15 @@ function renderDisruptions(container) {
     return;
   }
   disruptions.forEach(d => {
-    const line = d.line || d.impacted_objects?.[0]?.pt_object?.name || '?';
-    const msg = d.msg || d.messages?.[0]?.text || 'Perturbation en cours';
-    const time = d.time || d.updated_at || 'En cours';
+    const line = (d.line || '?').toString().slice(0, 4);
+    const msg  = (d.msg || 'Perturbation en cours').toString();
+    const time = (d.time || 'En cours').toString();
+    const type = (d.type || 'Perturbation').toString();
     container.innerHTML += `<div class="disrupt-card">
-      <div class="disrupt-line">${line.slice(0,3)}</div>
+      <div class="disrupt-line">${line}</div>
       <div class="disrupt-info">
-        <div class="disrupt-title">${d.type || 'Perturbation'}</div>
-        <div class="disrupt-body">${msg.slice(0,120)}${msg.length>120?'…':''}</div>
+        <div class="disrupt-title">${type}</div>
+        <div class="disrupt-body">${msg.slice(0,160)}${msg.length>160?'…':''}</div>
         <div class="disrupt-time">${time}</div>
       </div>
     </div>`;
@@ -1945,36 +1977,54 @@ function renderDisruptions(container) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// API 4 : OVERPASS (OSM) — Vélib' et stations Vélo
-// https://overpass-api.de/  (gratuit, sans clé)
+// API 4 : VÉLIB' MÉTROPOLE — GBFS officiel (gratuit, sans clé)
+// https://velib-metropole-opendata.smoove.pro/  (proxifié via /api/velib)
 // ═══════════════════════════════════════════════════════════
 let velibMarkers = [];
 let velibVisible = false;
+let velibCache = null;     // { stations: [...], ts: number } — réutilisé entre vues
+let velibCacheTs = 0;
 
-async function fetchVelib(lat, lon) {
-  try {
-    const rad = 600;
-    const q = `[out:json][timeout:10];node["amenity"="bicycle_rental"](${lat-0.008},${lon-0.012},${lat+0.008},${lon+0.012});out 12;`;
-    const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`);
-    const d = await r.json();
-    return d.elements || [];
-  } catch(e) { return []; }
+async function fetchVelib(lat, lon, radius = 700) {
+  // Le proxy mutualise via cache CDN 60s ; on garde aussi un petit cache
+  // côté client pour éviter de re-fetch quand l'utilisateur bouge légèrement.
+  const now = Date.now();
+  if (!velibCache || now - velibCacheTs > 45000) {
+    try {
+      const r = await fetch('/api/velib');
+      if (!r.ok) return [];
+      velibCache = await r.json();
+      velibCacheTs = now;
+    } catch (e) { return []; }
+  }
+  const all = (velibCache && velibCache.stations) || [];
+  // Filtrage par rayon haversine (distM est défini plus haut dans le fichier)
+  return all
+    .filter(s => s.renting && distM(lat, lon, s.lat, s.lon) <= radius)
+    .sort((a, b) => distM(lat, lon, a.lat, a.lon) - distM(lat, lon, b.lat, b.lon))
+    .slice(0, 25);
 }
 
-function showVelibOnMap(stations, uLat, uLon) {
+function showVelibOnMap(stations /*, uLat, uLon */) {
   velibMarkers.forEach(m => map.removeLayer(m));
   velibMarkers = [];
   stations.forEach(s => {
-    const name = s.tags?.name || s.tags?.['ref:FR:velib'] || 'Vélo';
-    const capacity = s.tags?.capacity || '?';
+    const total = (s.mech || 0) + (s.ebike || 0);
+    const color = total === 0 ? '#ff4757' : (total < 3 ? '#ff9f43' : '#00d68f');
     const icon = L.divIcon({
       className: '',
-      html: `<div class="vlib-pin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1M9 17.5l3-5.5 3-2 2-4H9.5L8 9.5"/><path d="M12 12l3 5.5"/></svg></div>`,
-      iconSize: [30, 30], iconAnchor: [15, 15]
+      html: `<div class="vlib-pin" style="background:${color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700">${total}</div>`,
+      iconSize: [30, 30], iconAnchor: [15, 15],
     });
     const m = L.marker([s.lat, s.lon], { icon })
       .addTo(map)
-      .bindPopup(`<b style="color:#0d0d1a">${name}</b><br><span style="color:#0d0d1a;font-size:12px">Capacité : ${capacity} vélos</span>`);
+      .bindPopup(
+        `<b style="color:#0d0d1a">${s.name}</b><br>` +
+        `<span style="color:#0d0d1a;font-size:12px">` +
+          `<b>${s.mech || 0}</b> méca · <b>${s.ebike || 0}</b> élec · <b>${s.docks || 0}</b> bornettes libres<br>` +
+          `Capacité ${s.capacity || '?'}` +
+        `</span>`
+      );
     velibMarkers.push(m);
   });
   velibVisible = true;
@@ -1997,29 +2047,11 @@ function toggleVelib() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// API 5 : HERE Geocoding — améliorer autocomplete (fallback Nominatim)
-// Clé gratuite Here : on utilise Nominatim en priorité, Here si échec
-// Pour l'activer : entrer la clé dans les réglages
+// (Bloc HERE Geocoding retiré — geoSug() utilise désormais
+//  l'API Adresse data.gouv.fr (BAN), gratuite, sans clé,
+//  et de meilleure qualité que Nominatim sur le périmètre France.)
 // ═══════════════════════════════════════════════════════════
-async function geoSugEnhanced(q) {
-  // Priorité 1 : Nominatim (déjà implémenté via geoSug)
-  const nom = await geoSug(q).catch(() => []);
-  if (nom.length >= 3) return nom;
-  // Priorité 2 : API HERE si clé disponible
-  const hereKey = prefs.hereKey || '';
-  if (hereKey) {
-    try {
-      const r = await fetch(`https://autocomplete.search.hereapi.com/v1/autocomplete?q=${encodeURIComponent(q)}&in=countryCode:FRA&limit=5&apiKey=${hereKey}`);
-      const d = await r.json();
-      return (d.items || []).map(i => ({
-        display_name: i.title,
-        lat: i.position?.lat || 48.8566,
-        lon: i.position?.lng || 2.3522
-      }));
-    } catch(e) {}
-  }
-  return nom;
-}
+async function geoSugEnhanced(q) { return geoSug(q).catch(() => []); }
 
 // ═══════════════════════════════════════════════════════════
 // API 6 : IDFM PRIM — Accessibilité PMR des stations
@@ -2114,6 +2146,13 @@ function appendDisruptions() {
   // Perturbations sans géoloc
   fetchDisruptions();
 })();
+
+// Service Worker — PWA, offline, cache tuiles + API
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* silencieux */ });
+  });
+}
 
 </script>
 
