@@ -3720,7 +3720,7 @@ function setTransportMode(mode) {
   );
   // Met à jour le placeholder du bouton
   const btn = document.getElementById('routeBtn');
-  const labels = { transit: 'Calculer l'itinéraire', walk: 'Calculer à pied', bike: 'Calculer à vélo' };
+  const labels = { transit: "Calculer l'itinéraire", walk: 'Calculer à pied', bike: 'Calculer à vélo' };
   if (btn) btn.childNodes[0].textContent = labels[mode] + ' ';
 }
 
