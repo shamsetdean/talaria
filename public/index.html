@@ -82,7 +82,7 @@ body {
 .ovl { position: fixed; z-index: 100; pointer-events: none; }
 .ovl > * { pointer-events: auto; }
 .ovl-tl { top: calc(12px + var(--safe-top)); left: 12px; }
-.ovl-tr { top: calc(12px + var(--safe-top)); right: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.ovl-tr { top: calc(12px + var(--safe-top)); right: 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 
 .logo {
   background: var(--glass);
@@ -949,9 +949,19 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
   transition: transform .14s cubic-bezier(.32,.72,0,1), box-shadow .14s;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  /* Garantit que le SVG hérité s'affiche correctement */
+  line-height: 0;
+  font-size: 0;
 }
 .poi-marker:active { transform: scale(0.86); box-shadow: 0 1px 6px rgba(0,0,0,0.18); }
-.poi-marker svg { width: 17px; height: 17px; pointer-events: none; }
+.poi-marker svg {
+  width: 17px; height: 17px;
+  pointer-events: none;
+  display: block;
+  stroke: #fff;
+  fill: none;
+  flex-shrink: 0;
+}
 .poi-marker.removing { animation: poiOut .22s ease both; }
 
 .poi-pharmacy { background: #00b87a; color: #fff; }
@@ -962,15 +972,25 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 .poi-chips {
   position: fixed;
   bottom: calc(var(--sheet-peek) + 10px);
-  left: 0; right: 80px;
+  /* Pleine largeur avec padding — scrollable horizontalement */
+  left: 0; right: 0;
   display: flex; gap: 8px;
-  padding: 0 14px;
+  padding: 0 14px 0 14px;
   z-index: 150;
   pointer-events: none;
-  overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+  overflow-x: auto;
+  -ms-overflow-style: none; scrollbar-width: none;
   transition: bottom .44s cubic-bezier(.32,.72,0,1), opacity .2s;
+  /* Padding-right adaptatif pour ne pas finir sous les boutons */
+  box-sizing: border-box;
 }
 .poi-chips::-webkit-scrollbar { display: none; }
+/* Pseudo-élément pour créer un espace scroll à droite sans chevauchement */
+.poi-chips::after {
+  content: '';
+  flex-shrink: 0;
+  width: 66px; /* largeur du groupe boutons + marge */
+}
 .poi-chip {
   background: rgba(8,9,18,0.86);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
@@ -989,14 +1009,15 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
   animation: chipIn .3s cubic-bezier(.32,.72,0,1) both;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
+  min-height: 36px;
 }
-.poi-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
+.poi-chip svg { width: 14px; height: 14px; flex-shrink: 0; display: block; }
 .poi-chip:active { transform: scale(0.93); }
 .poi-chip.active { color: #fff; border-color: transparent; }
 .poi-chip.active.poi-chip-pharmacy { background: #00b87a; }
 .poi-chip.active.poi-chip-police   { background: #2255cc; }
 .poi-chip.active.poi-chip-atm      { background: #d97000; }
-.poi-chip.dimmed { opacity: 0.5; }
+.poi-chip.dimmed { opacity: 0.45; }
 
 /* ═══ ZOOM HINT ═══ */
 .zoom-hint {
@@ -3283,15 +3304,24 @@ function renderPOIType(type) {
   items.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = `poi-marker ${cfg.cls}`;
-    el.innerHTML = cfg.icon;
+    // Créer le SVG via parser pour garantir le namespace SVG correct
+    const tmp = document.createElement('template');
+    tmp.innerHTML = cfg.icon;
+    const svgNode = tmp.content.firstChild;
+    if (svgNode) {
+      svgNode.setAttribute('width', '17');
+      svgNode.setAttribute('height', '17');
+      svgNode.style.display = 'block';
+      svgNode.style.stroke = '#ffffff';
+      svgNode.style.fill = 'none';
+      el.appendChild(svgNode);
+    }
     el.style.animationDelay = `${Math.min(i * 25, 280)}ms`;
     el.setAttribute('aria-label', item.name || cfg.label);
 
     el.addEventListener('click', e => {
       e.stopPropagation();
-      // Centrer la carte sur le POI
       map.easeTo({ center:[item.lon, item.lat], zoom: Math.max(map.getZoom(), 17), duration: 480, easing: t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t });
-      // Afficher une notif avec les infos
       const sub = item.addr || (item.opening ? item.opening : cfg.label);
       showNotif('ok', item.name || cfg.label, sub, 3500);
     });
@@ -3406,7 +3436,20 @@ function initPOISystem() {
     const chip = document.createElement('button');
     chip.className = `poi-chip ${cfg.chipCls} active`;
     chip.id = `poi-chip-${type}`;
-    chip.innerHTML = `${cfg.icon}<span>${cfg.label}</span>`;
+    // Parser le SVG pour garantir le namespace
+    const tmp2 = document.createElement('template');
+    tmp2.innerHTML = cfg.icon;
+    const chipSvg = tmp2.content.firstChild;
+    if (chipSvg) {
+      chipSvg.setAttribute('width', '14');
+      chipSvg.setAttribute('height', '14');
+      chipSvg.style.display = 'block';
+      chipSvg.style.flexShrink = '0';
+      chip.appendChild(chipSvg);
+    }
+    const label = document.createElement('span');
+    label.textContent = cfg.label;
+    chip.appendChild(label);
     chip.addEventListener('click', () => togglePOILayer(type));
     chipsEl.appendChild(chip);
   });
