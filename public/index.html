@@ -3469,10 +3469,11 @@ const poi = {
 };
 
 // Fetch depuis Overpass API OSM
+// Proxy Vercel — la requête part du serveur, pas du navigateur (pas de CORS)
 async function fetchPOIData(lat, lon, amenity, radius=1000) {
   const q = `[out:json][timeout:12];node["amenity"="${amenity}"](around:${radius},${lat},${lon});out;`;
   try {
-    const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`);
+    const r = await fetch(`/api/overpass?data=${encodeURIComponent(q)}`);
     if (!r.ok) return [];
     const d = await r.json();
     return (d.elements||[]).map(e => ({
