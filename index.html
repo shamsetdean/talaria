@@ -1176,7 +1176,25 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 <script>
 'use strict';
 
+// ═══ STORAGE HELPER (résistant au mode privé / WebView / SecurityError) ═══
+const safeLS = {
+  get(key, fallback = null) {
+    try { const v = localStorage.getItem(key); return v !== null ? v : fallback; }
+    catch(e) { return fallback; }
+  },
+  getJSON(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e) { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, value); } catch(e) {}
+  }
+};
+
 // ═══ STATE ═══
+// dtMode déclaré EN PREMIER pour éviter la TDZ si localStorage throw avant la ligne 1199
+let dtMode = 'now', dtTime = '';
+
 let userPos = null;
 let uMarker = null;
 let rLayers = [];      // MapLibre layers/sources à nettoyer
@@ -1188,15 +1206,14 @@ let tapActive = false;
 let tapJourney = null;
 let tapFromCoord = null;
 let tapToCoord = null;
-let optimizeFor = localStorage.getItem('talaria_opt') || 'fastest';
-let favorites = JSON.parse(localStorage.getItem('talaria_favs') || '[]');
-let incidents = JSON.parse(localStorage.getItem('talaria_inc') || '[]');
-let prefs = JSON.parse(localStorage.getItem('talaria_prefs') || '{}');
+let optimizeFor = safeLS.get('talaria_opt', 'fastest');
+let favorites = safeLS.getJSON('talaria_favs', []);
+let incidents = safeLS.getJSON('talaria_inc', []);
+let prefs = safeLS.getJSON('talaria_prefs', {});
 let fromCoordStored = null;
 let is3D = false;
 let disruptions = [];
-let modeFilter = JSON.parse(localStorage.getItem('talaria_modes') || '{}');
-let dtMode = 'now', dtTime = '';
+let modeFilter = safeLS.getJSON('talaria_modes', {});
 const ALL_MODES = [
   { id:'metro', label:'Métro', pid:'physical_mode:Metro' },
   { id:'rer',   label:'RER',   pid:'physical_mode:RapidTransit' },
@@ -2073,7 +2090,7 @@ function bindModeFilterChips() {
     chip.onclick = e => {
       e.stopPropagation();
       modeFilter[chip.dataset.mode] = !isModeOn(chip.dataset.mode);
-      localStorage.setItem('talaria_modes', JSON.stringify(modeFilter));
+      safeLS.set('talaria_modes', JSON.stringify(modeFilter));
       chip.classList.toggle('on', isModeOn(chip.dataset.mode));
       if (window._routeCtx?.fromVal) doRoute();
     };
@@ -2453,14 +2470,14 @@ function launchFav(i) {
 }
 function removeFav(id) {
   favorites = favorites.filter(f => f.id !== id);
-  localStorage.setItem('talaria_favs', JSON.stringify(favorites));
+  safeLS.set('talaria_favs', JSON.stringify(favorites));
   renderFavs();
 }
 
 // ═══ OPT ═══
 function setOpt(mode) {
   optimizeFor = mode;
-  localStorage.setItem('talaria_opt', mode);
+  safeLS.set('talaria_opt', mode);
   document.querySelectorAll('.opt-pill').forEach(p => p.classList.toggle('on', p.onclick?.toString().includes(mode)));
   if (window._journeys?.length) {
     const out = document.getElementById('route-out');
@@ -2479,7 +2496,7 @@ function submitInc() {
   if (!selTypeVal) return;
   const inc = { id:Date.now(), type:selTypeVal, line:document.getElementById('incLine').value.trim()||'Non précisé', desc:document.getElementById('incDesc').value.trim(), ts:new Date().toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'}) };
   incidents.unshift(inc); if (incidents.length > 20) incidents.length = 20;
-  localStorage.setItem('talaria_inc', JSON.stringify(incidents));
+  safeLS.set('talaria_inc', JSON.stringify(incidents));
   renderInc(); fb.style.display='block'; fb.textContent='✓ Signalement envoyé';
   setTimeout(() => { fb.style.display='none'; }, 3000);
   selTypeVal=''; document.querySelectorAll('.inc-type').forEach(t=>t.classList.remove('on'));
@@ -2680,10 +2697,10 @@ function shareCurrentJourney() {
 }
 
 // ═══ ADDRESSES & CONTACTS ═══
-let addresses = JSON.parse(localStorage.getItem('talaria_addresses')||'[]');
-let contacts  = JSON.parse(localStorage.getItem('talaria_contacts') ||'[]');
-function saveAddresses() { localStorage.setItem('talaria_addresses', JSON.stringify(addresses)); }
-function saveContacts()  { localStorage.setItem('talaria_contacts',  JSON.stringify(contacts)); }
+let addresses = safeLS.getJSON('talaria_addresses', []);
+let contacts  = safeLS.getJSON('talaria_contacts',  []);
+function saveAddresses() { safeLS.set('talaria_addresses', JSON.stringify(addresses)); }
+function saveContacts()  { safeLS.set('talaria_contacts',  JSON.stringify(contacts)); }
 function renderAddresses() {
   const list = document.getElementById('addrList');
   if (!list) return;
