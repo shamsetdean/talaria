@@ -1795,8 +1795,9 @@ async function reverseGeo(lat, lon) {
 }
 
 // ═══ HELPERS ═══
-const s2m = s => { const m = Math.round(s / 60); return m < 60 ? `${m} min` : `${Math.floor(m/60)}h${String(m%60).padStart(2,'0')}`; };
-const fmtT = dt => dt?.length >= 13 ? `${dt.slice(9,11)}:${dt.slice(11,13)}` : '';
+// function declarations (pas const arrows) = hoistées, jamais en TDZ
+function s2m(s) { const m = Math.round(s / 60); return m < 60 ? `${m} min` : `${Math.floor(m/60)}h${String(m%60).padStart(2,'0')}`; }
+function fmtT(dt) { return dt?.length >= 13 ? `${dt.slice(9,11)}:${dt.slice(11,13)}` : ''; }
 function modeOf(s) {
   if (['street_network','walking','transfer'].includes(s.type)) return 'WALK';
   const m = (s.display_informations?.commercial_mode || '').toUpperCase();
