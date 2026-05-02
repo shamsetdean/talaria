@@ -1340,32 +1340,6 @@ map.on('load', () => {
     paint: { 'line-color': ['get', 'color'], 'line-width': 10, 'line-opacity': 0.15, 'line-blur': 4 }
   });
 
-  // Bâtiments 3D (OSM vector tiles via demotiles — sans clé)
-  // Note : nécessite une source vector tiles avec couche building
-  try {
-    map.addSource('openmaptiles', {
-      type: 'vector',
-      url: 'https://demotiles.maplibre.org/tiles/tiles.json'
-    });
-    map.addLayer({
-      id: 'buildings-3d',
-      type: 'fill-extrusion',
-      source: 'openmaptiles',
-      'source-layer': 'building',
-      filter: ['>', ['get', 'render_height'], 0],
-      layout: { visibility: 'none' },
-      paint: {
-        'fill-extrusion-color': ['interpolate', ['linear'], ['get', 'render_height'],
-          0, '#1a1a2e', 20, '#1e2040', 50, '#252550', 100, '#2a2a60'
-        ],
-        'fill-extrusion-height': ['get', 'render_height'],
-        'fill-extrusion-base': ['get', 'render_min_height'],
-        'fill-extrusion-opacity': 0.75
-      }
-    }, 'route-shadow');
-  } catch(e) {
-    // Fallback silencieux si la source n'est pas disponible
-  }
 });
 
 map.on('click', e => {
@@ -1380,16 +1354,10 @@ function toggle3D() {
   if (is3D) {
     map.easeTo({ pitch: 52, bearing: -10, duration: 800 });
     if (btn) btn.classList.add('mode-3d-on');
-    if (map.getLayer('buildings-3d')) {
-      map.setLayoutProperty('buildings-3d', 'visibility', 'visible');
-    }
-    showNotif('ok', 'Vue 3D activée', 'Bâtiments extrudés');
+    showNotif('ok', 'Vue 3D activée', 'Inclinez la carte');
   } else {
     map.easeTo({ pitch: 0, bearing: 0, duration: 600 });
     if (btn) btn.classList.remove('mode-3d-on');
-    if (map.getLayer('buildings-3d')) {
-      map.setLayoutProperty('buildings-3d', 'visibility', 'none');
-    }
   }
 }
 
