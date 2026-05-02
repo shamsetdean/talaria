@@ -1195,6 +1195,14 @@ let prefs = JSON.parse(localStorage.getItem('talaria_prefs') || '{}');
 let fromCoordStored = null;
 let is3D = false;
 let disruptions = [];
+let modeFilter = JSON.parse(localStorage.getItem('talaria_modes') || '{}');
+const ALL_MODES = [
+  { id:'metro', label:'Métro', pid:'physical_mode:Metro' },
+  { id:'rer',   label:'RER',   pid:'physical_mode:RapidTransit' },
+  { id:'bus',   label:'Bus',   pid:'physical_mode:Bus' },
+  { id:'tram',  label:'Tram',  pid:'physical_mode:Tramway' },
+  { id:'rail',  label:'Train', pid:'physical_mode:LocalTrain' },
+];
 
 // ═══ MAPLIBRE GL — INIT ═══
 const map = new maplibregl.Map({
@@ -2054,14 +2062,6 @@ function renderJourneys(data, out, destName, fc, tc, append) {
 }
 
 // ═══ MODE FILTER ═══
-let modeFilter = JSON.parse(localStorage.getItem('talaria_modes') || '{}');
-const ALL_MODES = [
-  { id:'metro', label:'Métro', pid:'physical_mode:Metro' },
-  { id:'rer',   label:'RER',   pid:'physical_mode:RapidTransit' },
-  { id:'bus',   label:'Bus',   pid:'physical_mode:Bus' },
-  { id:'tram',  label:'Tram',  pid:'physical_mode:Tramway' },
-  { id:'rail',  label:'Train', pid:'physical_mode:LocalTrain' },
-];
 function isModeOn(id) { return modeFilter[id] !== false; }
 function getForbiddenModes() { return ALL_MODES.filter(m => modeFilter[m.id] === false).map(m => m.pid); }
 function renderModeFilter() {
