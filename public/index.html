@@ -246,7 +246,7 @@ body {
   position: fixed;
   top: calc(68px + var(--safe-top));
   left: 14px;
-  right: 72px; /* espace pour le groupe de boutons (42px + 16px marges) */
+  right: 80px; /* espace pour le groupe de boutons */
   z-index: 95;
   background: var(--glass);
   -webkit-backdrop-filter: blur(32px) saturate(180%);
@@ -970,6 +970,7 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 
 /* ═══ POI CHIPS (layer toggles) ═══ */
 .poi-chips {
+  display: none !important; /* remplacé par le panel Couches */
   position: fixed;
   bottom: calc(var(--sheet-peek) + 10px);
   /* Pleine largeur avec padding — scrollable horizontalement */
@@ -1168,8 +1169,14 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 /* ═══ MÉTÉO CYCLIQUE ═══ */
 .env-cycle-item { display: inline-flex; align-items: center; gap: 6px; }
 .env-cycle-item svg { width: 13px; height: 13px; }
-#env-bar { transition: opacity .25s ease; }
-#env-bar.fading { opacity: 0 !important; }
+#env-bar {
+  background: rgba(30,32,44,0.82) !important;
+  border-color: rgba(255,255,255,0.14) !important;
+  transition: none;
+  min-width: 88px;
+}
+.env-text-inner { transition: opacity .22s ease; display: inline-flex; align-items: center; gap: 6px; }
+.env-text-inner.fading { opacity: 0; }
 
 /* ═══ COUCHES PANEL ═══ */
 .layers-panel {
@@ -1296,6 +1303,88 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 }
 .ar-stat-val { font-size: 18px; font-weight: 800; color: var(--blue); font-family: 'JetBrains Mono',monospace; }
 .ar-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+
+/* ═══ FUTURISTE — Design amélioré ═══ */
+
+/* Boutons carte — glow au hover */
+.mapbtn {
+  position: relative;
+  overflow: hidden;
+}
+.mapbtn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(68,136,255,0.12) 0%, transparent 70%);
+  opacity: 0; transition: opacity .2s;
+  border-radius: inherit;
+}
+.mapbtn:hover::before { opacity: 1; }
+.mapbtn.on { color: var(--blue); }
+
+/* Route — style plus visible */
+.maplibregl-canvas-container .mapboxgl-canvas,
+.maplibregl-canvas-container canvas { cursor: grab; }
+
+/* GOFab — pulse animé */
+#goFab {
+  animation: goFabPulse 2.8s cubic-bezier(.36,.07,.19,.97) infinite !important;
+}
+@keyframes goFabPulse {
+  0%,100% { box-shadow: 0 4px 24px rgba(0,214,143,0.45), 0 0 0 0 rgba(0,214,143,0); }
+  50%      { box-shadow: 0 4px 24px rgba(0,214,143,0.6), 0 0 0 10px rgba(0,214,143,0); }
+}
+
+/* Capsule météo — toujours visible, fond gris opaque */
+.capsule {
+  display: flex !important;
+  align-items: center !important;
+  background: rgba(28,30,48,0.88) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  min-width: 90px;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+/* Transport pills — futuriste */
+.tmode-pill.active[data-mode="transit"] {
+  background: linear-gradient(135deg, #3366ff, #1144cc);
+  box-shadow: 0 4px 16px rgba(68,136,255,0.4);
+}
+.tmode-pill.active[data-mode="walk"] {
+  background: linear-gradient(135deg, #00d68f, #009966);
+  box-shadow: 0 4px 16px rgba(0,214,143,0.4);
+}
+.tmode-pill.active[data-mode="bike"] {
+  background: linear-gradient(135deg, #ff9500, #cc7700);
+  box-shadow: 0 4px 16px rgba(217,112,0,0.4);
+}
+
+/* Layers panel — positionnement sans chevauchement */
+.layers-panel {
+  top: calc(12px + var(--safe-top)) !important;
+  right: 76px !important;
+  transform-origin: top right;
+}
+.layers-panel.open { transform: translateX(0) !important; opacity: 1 !important; }
+
+/* Map actions — s'assurer qu'il ne se superpose pas */
+.map-actions {
+  top: calc(12px + var(--safe-top));
+  right: 14px;
+}
+
+
+/* Layers panel — à gauche du groupe boutons */
+.layers-panel { top: calc(12px + var(--safe-top)); right: 76px; transform-origin: top right; }
+/* Jcard — futuriste */
+.jcard.best {
+  background: linear-gradient(145deg, rgba(20,22,40,0.95), rgba(12,14,28,0.98)) !important;
+  border-left: 3px solid var(--blue) !important;
+  box-shadow: 0 4px 24px rgba(68,136,255,0.12), inset 0 0 0 0.5px rgba(255,255,255,0.06) !important;
+}
 
 </style>
 </head>
@@ -1999,6 +2088,11 @@ function openAR() {
   }
 
   updateARInstruction();
+  // Lancer le scan de lieux dès l'ouverture AR
+  if (userPos) {
+    fetchARNearbyPOIs(userPos.lat, userPos.lon);
+    setInterval(() => { if (userPos) fetchARNearbyPOIs(userPos.lat, userPos.lon); }, 15000);
+  }
 }
 
 function onOrientation(e) {
@@ -2181,8 +2275,13 @@ function drawARDirectionIndicator(ctx, W, H) {
     document.getElementById('arStatBear').textContent = Math.round(bearing);
   }
 
-  // Fetch lieu périodiquement
-  if (userPos) fetchARPlaceInfo(userPos.lat, userPos.lon);
+  // Fetch lieu + POIs périodiquement
+  if (userPos) {
+    fetchARPlaceInfo(userPos.lat, userPos.lon);
+    fetchARNearbyPOIs(userPos.lat, userPos.lon);
+  }
+  drawARNearbyLabels(ctx, W, H);
+  drawScanStatusBadge(ctx, W);
 }
 
 function drawARScanCircle(ctx, W, H) {
@@ -2242,6 +2341,10 @@ function drawARScanCircle(ctx, W, H) {
   ctx.fillStyle = `rgba(68,136,255,${0.5 + pulse * 0.3})`;
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   ctx.fillText('SCAN EN COURS', cx, cy + 155);
+
+  // Afficher les POIs reconnus
+  drawARNearbyLabels(ctx, W, H);
+  drawScanStatusBadge(ctx, W);
 }
 
 function updateARInstruction() {
@@ -3444,13 +3547,13 @@ function buildWeatherItems() {
 function cycleWeatherDisplay() {
   const bar = document.getElementById('env-bar');
   if (!bar || !_weatherCycleItems.length) return;
-  bar.classList.add('fading');
+  const inner = bar.querySelector('.env-text-inner');
+  if (inner) { inner.classList.add('fading'); }
   setTimeout(() => {
     _weatherCycleIdx = (_weatherCycleIdx + 1) % _weatherCycleItems.length;
-    bar.innerHTML = _weatherCycleItems[_weatherCycleIdx];
+    bar.innerHTML = `<span class="env-text-inner">${_weatherCycleItems[_weatherCycleIdx]}</span>`;
     bar.style.display = 'flex';
-    bar.classList.remove('fading');
-  }, 260);
+  }, 230);
 }
 
 function renderEnvBar() {
@@ -3459,7 +3562,7 @@ function renderEnvBar() {
   buildWeatherItems();
   if (!_weatherCycleItems.length) return;
   _weatherCycleIdx = 0;
-  bar.innerHTML = _weatherCycleItems[0];
+  bar.innerHTML = `<span class="env-text-inner">${_weatherCycleItems[0]}</span>`;
   bar.style.display = 'flex';
   if (_weatherCycleTimer) clearInterval(_weatherCycleTimer);
   _weatherCycleTimer = setInterval(cycleWeatherDisplay, 3200);
@@ -3760,6 +3863,24 @@ function showWalkBikeResult(fc, tc, mode) {
   drawWalkRoute(fc, tc);
   setSheetState('mid');
   out.dataset.calculated = '1';
+
+  // Synthetic journey pour activer le bouton GO + navigation AR
+  const synthJourney = {
+    departure_date_time: new Date().toISOString().replace(/[-:T.]/g, '').slice(0,15),
+    arrival_date_time: new Date(Date.now() + dur * 60000).toISOString().replace(/[-:T.]/g, '').slice(0,15),
+    duration: dur * 60,
+    nb_transfers: 0,
+    sections: [{
+      type: 'street_network',
+      mode: 'walking',
+      duration: dur * 60,
+      from: { name: fc.label || 'Départ' },
+      to: { name: tc.label || 'Arrivée' },
+      geojson: { coordinates: [[fc.lon, fc.lat], [tc.lon, tc.lat]] },
+      display_informations: { label: mode === 'bike' ? 'Vélo' : 'À pied', direction: tc.label || 'Arrivée', commercial_mode: mode === 'bike' ? 'Bike' : 'Walking' }
+    }]
+  };
+  showGoFab(synthJourney);
 }
 
 // ═══ LAYERS PANEL ═══
@@ -3793,6 +3914,151 @@ function toggleLP(type) {
 
 // ═══ 3D AMÉLIORÉ ═══
 let _3dAutoRotate = null;
+
+
+// ═══════════════════════════════════════════════
+// ═══ AR — RECONNAISSANCE DE LIEUX & OBJETS ═══
+// ═══════════════════════════════════════════════
+
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    this.closePath();
+  };
+}
+
+let _arNearbyPOIs   = [];
+let _arLastScan     = 0;
+let _arScanPulse    = 0; // pour l'animation de scan actif
+
+const AR_POI_ICONS = {
+  police:     '🛡', pharmacy: '⊕', atm: '💰',
+  supermarket:'🛒', museum:   '🏛', restaurant:'🍽',
+  cafe:       '☕', hospital: '🏥', default:   '📍'
+};
+
+async function fetchARNearbyPOIs(lat, lon) {
+  if (Date.now() - _arLastScan < 12000) return;
+  _arLastScan = Date.now();
+  _arScanPulse = Date.now(); // déclenche l'animation de scan
+
+  const types = [
+    '"amenity"="pharmacy"', '"amenity"="police"', '"amenity"="atm"',
+    '"shop"="supermarket"', '"tourism"="museum"', '"amenity"="restaurant"',
+    '"amenity"="cafe"',     '"amenity"="hospital"'
+  ];
+  const q = `[out:json][timeout:8];(${
+    types.map(t => `node[${t}](around:400,${lat},${lon})`).join(';')
+  });out;`;
+
+  try {
+    const r = await fetch(`/api/overpass?data=${encodeURIComponent(q)}`);
+    if (!r.ok) return;
+    const d = await r.json();
+    _arNearbyPOIs = (d.elements || [])
+      .filter(e => e.tags?.name)
+      .slice(0, 8)
+      .map(e => {
+        const type = Object.keys(AR_POI_ICONS).find(k => e.tags[k] || e.tags.amenity === k || e.tags.shop === k || e.tags.tourism === k) || 'default';
+        return { lat: e.lat, lon: e.lon, name: e.tags.name, type };
+      });
+  } catch {}
+}
+
+function drawARNearbyLabels(ctx, W, H) {
+  if (!userPos || !_arNearbyPOIs.length) return;
+
+  _arNearbyPOIs.forEach((p, idx) => {
+    // Bearing utilisateur → POI
+    const dLon = (p.lon - userPos.lon) * Math.PI / 180;
+    const lat1 = userPos.lat * Math.PI / 180, lat2 = p.lat * Math.PI / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    const poiBearing = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    const relBear    = ((poiBearing - arOrientation.alpha) + 360) % 360;
+
+    // FOV ±70°
+    let screenAngle = relBear > 180 ? relBear - 360 : relBear;
+    if (Math.abs(screenAngle) > 70) return;
+
+    const dist = distM(userPos.lat, userPos.lon, p.lat, p.lon);
+    // Position écran : angle → X, distance → Y (plus loin = plus haut)
+    const screenX = W / 2 + (screenAngle / 70) * (W * 0.42);
+    const baseY   = H * 0.28 + (Math.min(dist, 400) / 400) * (H * 0.22);
+    const screenY = Math.max(baseY, 90);
+
+    const icon  = AR_POI_ICONS[p.type] || '📍';
+    const label = p.name.slice(0, 22);
+    const distLabel = dist < 1000 ? `${Math.round(dist)}m` : `${(dist/1000).toFixed(1)}km`;
+
+    ctx.save();
+
+    // Ligne de connexion vers bas d'écran
+    const gradient = ctx.createLinearGradient(screenX, screenY + 22, screenX, H * 0.72);
+    gradient.addColorStop(0, 'rgba(68,136,255,0.35)');
+    gradient.addColorStop(1, 'rgba(68,136,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(screenX, screenY + 22); ctx.lineTo(screenX, H * 0.72);
+    ctx.strokeStyle = gradient; ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // Fond pill avec bord lumineux
+    ctx.font = '600 12px JetBrains Mono, monospace';
+    const tw = ctx.measureText(label).width;
+    const bW = Math.max(tw + 28, 80), bH = 40, bR = 10;
+
+    // Glow
+    ctx.shadowColor = 'rgba(68,136,255,0.5)';
+    ctx.shadowBlur  = 12;
+    ctx.beginPath(); ctx.roundRect(screenX - bW/2, screenY - bH/2, bW, bH, bR);
+    ctx.fillStyle = 'rgba(7,8,18,0.82)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(68,136,255,0.55)'; ctx.lineWidth = 0.8; ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Icône
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(icon, screenX - tw/2 + 2, screenY - 6);
+
+    // Nom
+    ctx.font = '600 11px JetBrains Mono, monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(label, screenX + 6, screenY - 6);
+
+    // Distance badge
+    ctx.font = '700 10px JetBrains Mono, monospace';
+    ctx.fillStyle = 'rgba(68,136,255,0.9)';
+    ctx.fillText(distLabel, screenX, screenY + 12);
+
+    ctx.restore();
+  });
+}
+
+// Indicateur de scan actif sur le canvas (coin supérieur droit)
+function drawScanStatusBadge(ctx, W) {
+  const t    = Date.now() / 1000;
+  const scanning = (Date.now() - _arLastScan) < 2000;
+  const pulse = 0.5 + 0.5 * Math.sin(t * 4);
+
+  ctx.save();
+  ctx.font = '600 10px JetBrains Mono, monospace';
+  const label = scanning ? 'SCAN...' : `${_arNearbyPOIs.length} LIEUX`;
+  const tw = ctx.measureText(label).width;
+  const bW = tw + 22, bH = 22;
+  const bX = W - bW - 12, bY = 12;
+
+  ctx.beginPath(); ctx.roundRect(bX, bY, bW, bH, 5);
+  ctx.fillStyle = scanning ? `rgba(68,136,255,${0.55 + pulse * 0.25})` : 'rgba(0,214,143,0.55)';
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, bX + bW/2, bY + bH/2);
+  ctx.restore();
+}
 
 // PWA
 if ('serviceWorker' in navigator) {
