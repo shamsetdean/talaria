@@ -13,8 +13,8 @@
 <title>Talaria</title>
 
 <!-- MapLibre GL JS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/3.6.2/maplibre-gl.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/3.6.2/maplibre-gl.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 
@@ -1855,7 +1855,7 @@ function stressScore(j) {
 }
 
 // ═══ AUTOCOMPLETE ═══
-const acTimers = {};
+var acTimers = {};
 function acF(inp, key) {
   if (key === 'from') fromCoordStored = null;
   clearTimeout(acTimers[key]);
@@ -1907,7 +1907,7 @@ function geoFrom() {
 
 // ═══ TRAJET ═══
 window._journeys = [];
-let currentTrip = null;
+var currentTrip = null;
 
 function drawWalkRoute(fc, tc) {
   clearMap();
@@ -2132,7 +2132,7 @@ function getDatetimeParams() {
 }
 
 // ═══ ARRÊTS ═══
-const acStopT = {};
+var acStopT = {};
 function acStop(inp) {
   selStopId = null;
   clearTimeout(acStopT.t);
@@ -2909,7 +2909,7 @@ function injectGaresTab() {
   pages.appendChild(page);
   document.getElementById('sncf-gare').addEventListener('input', function(){acSncfGare(this);});
 }
-const acSncfT={};
+var acSncfT={};
 async function acSncfGare(inp) {
   clearTimeout(acSncfT.t);
   const q=inp.value.trim(), list=document.getElementById('ac-sncf-gare');
