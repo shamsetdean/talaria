@@ -58,7 +58,7 @@
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body {
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: #1a1a25;
+  background: #eae6e0;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
@@ -68,7 +68,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #1a1a25;
+  background: #eae6e0;
 }
 .maplibregl-ctrl-attrib {
   background: rgba(7,8,15,0.6) !important;
@@ -908,6 +908,126 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
   .jdur { font-size: 34px; }
   .jtimes { font-size: 16px; }
 }
+
+/* ═══ MOBILE-FIRST REFINEMENTS ═══ */
+@media (max-width: 430px) {
+  .pages { padding: 12px 12px calc(14px + var(--safe-bot)); }
+  .jcard { padding: 16px 14px 12px; }
+  .ovl-tl { top: calc(10px + var(--safe-top)); left: 10px; }
+  .ovl-tr { top: calc(10px + var(--safe-top)); right: 10px; }
+}
+
+/* ═══ ANIMATIONS FLUIDES ═══ */
+@keyframes poiIn {
+  0%   { transform: scale(0.2) translateY(12px); opacity: 0; }
+  65%  { transform: scale(1.1) translateY(-3px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes poiOut {
+  from { transform: scale(1); opacity: 1; }
+  to   { transform: scale(0.2); opacity: 0; }
+}
+@keyframes chipIn {
+  from { transform: translateY(10px) scale(.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes hintIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.maplibregl-canvas { will-change: transform; }
+
+/* ═══ POI MARKERS ═══ */
+.poi-marker {
+  width: 36px; height: 36px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: 2.5px solid rgba(255,255,255,0.95);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.22);
+  animation: poiIn .32s cubic-bezier(.32,.72,0,1) both;
+  transition: transform .14s cubic-bezier(.32,.72,0,1), box-shadow .14s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.poi-marker:active { transform: scale(0.86); box-shadow: 0 1px 6px rgba(0,0,0,0.18); }
+.poi-marker svg { width: 17px; height: 17px; pointer-events: none; }
+.poi-marker.removing { animation: poiOut .22s ease both; }
+
+.poi-pharmacy { background: #00b87a; color: #fff; }
+.poi-police   { background: #2255cc; color: #fff; }
+.poi-atm      { background: #d97000; color: #fff; }
+
+/* ═══ POI CHIPS (layer toggles) ═══ */
+.poi-chips {
+  position: fixed;
+  bottom: calc(var(--sheet-peek) + 10px);
+  left: 0; right: 80px;
+  display: flex; gap: 8px;
+  padding: 0 14px;
+  z-index: 150;
+  pointer-events: none;
+  overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+  transition: bottom .44s cubic-bezier(.32,.72,0,1), opacity .2s;
+}
+.poi-chips::-webkit-scrollbar { display: none; }
+.poi-chip {
+  background: rgba(8,9,18,0.86);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  border-radius: 99px;
+  padding: 8px 13px 8px 9px;
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; pointer-events: auto;
+  white-space: nowrap;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.28);
+  transition: all .18s cubic-bezier(.32,.72,0,1);
+  animation: chipIn .3s cubic-bezier(.32,.72,0,1) both;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.poi-chip svg { width: 14px; height: 14px; flex-shrink: 0; }
+.poi-chip:active { transform: scale(0.93); }
+.poi-chip.active { color: #fff; border-color: transparent; }
+.poi-chip.active.poi-chip-pharmacy { background: #00b87a; }
+.poi-chip.active.poi-chip-police   { background: #2255cc; }
+.poi-chip.active.poi-chip-atm      { background: #d97000; }
+.poi-chip.dimmed { opacity: 0.5; }
+
+/* ═══ ZOOM HINT ═══ */
+.zoom-hint {
+  position: fixed;
+  bottom: calc(var(--sheet-peek) + 56px);
+  left: 50%; transform: translateX(-50%) translateY(6px);
+  background: rgba(8,9,18,0.86);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.78);
+  pointer-events: none; white-space: nowrap;
+  z-index: 160; opacity: 0;
+  transition: opacity .3s ease, transform .3s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.zoom-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ═══ LUCIDE ICON REPLACEMENTS ═══ */
+/* Fav star → SVG */
+.fav-star { display: inline-flex; align-items: center; color: var(--orange); line-height: 1; }
+.fav-star svg { width: 13px; height: 13px; fill: currentColor; }
+/* Refresh buttons → icône SVG */
+.refbtn { gap: 6px; }
+/* dt-arrow → chevron SVG */
+.dt-select .dt-arrow { display: inline-flex; align-items: center; color: var(--ink-3); }
+/* Walk pill → icône */
+.pill.WALK { display: inline-flex; align-items: center; gap: 3px; }
 </style>
 </head>
 <body>
@@ -1072,7 +1192,7 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 10l-4-4 4-4M3 6h18M17 14l4 4-4 4M21 18H3"/></svg>
           </button>
         </div>
-        <button class="btn" id="routeBtn" onclick="doRoute()">Calculer l'itinéraire →</button>
+        <button class="btn" id="routeBtn" onclick="doRoute()">Calculer l'itinéraire <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
         <div class="opt-pills" id="opt-pills" style="display:none">
           <button class="opt-pill on" onclick="setOpt('fastest')">Rapide</button>
           <button class="opt-pill" onclick="setOpt('stress')">Moins de stress</button>
@@ -1086,7 +1206,7 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
           <input type="text" id="stopQ" placeholder="Nom de l'arrêt…" autocomplete="off" oninput="acStop(this)"/>
           <div class="ac" id="ac-stop"></div>
         </div>
-        <button class="btn" id="stopBtn" onclick="doStop()">Voir les passages →</button>
+        <button class="btn" id="stopBtn" onclick="doStop()">Voir les passages <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
         <div class="block-title" id="nearbyTitle" style="display:none">Près de toi</div>
         <div id="nearbyStops" class="nearby-stops"></div>
         <div id="stop-out" style="margin-top:14px"></div>
@@ -1267,16 +1387,16 @@ const map = new maplibregl.Map({
   style: {
     version: 8,
     sources: {
-      'carto-dark': {
+      'carto-light': {
         type: 'raster',
-        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-                'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
-                'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'],
+        tiles: ['https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+                'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+                'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png'],
         tileSize: 256,
         attribution: '© OpenStreetMap © CARTO'
       }
     },
-    layers: [{ id: 'carto-dark-layer', type: 'raster', source: 'carto-dark' }],
+    layers: [{ id: 'carto-light-layer', type: 'raster', source: 'carto-light' }],
     glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf'
   },
   center: [2.3522, 48.8566],
@@ -2128,7 +2248,7 @@ function renderDtSelector() {
   if (dtMode === 'arrive' && dtTime) label = 'Arriver à ' + dtTime;
   return `<button class="dt-select" onclick="openDtPopover()">
     <span class="dt-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${label}</span>
-    <span class="dt-arrow">▾</span>
+    <span class="dt-arrow"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
   </button>`;
 }
 function openDtPopover() { document.getElementById('dtPopover').classList.add('show'); refreshDtPopoverUI(); }
@@ -2347,7 +2467,7 @@ function renderDep(data, container, stopName, stopId) {
   });
   if (!Object.keys(lines).length) { container.innerHTML = '<div class="err">Aucun départ dans les 2h.</div>'; return; }
   const ts = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:12px;font-weight:600;color:var(--ink)">Prochains passages</div><div id="cdTimer" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);margin-top:2px">Màj ${ts} · 30s</div></div><button class="refbtn" onclick="loadDep('${stopId}',this.closest('[id]'),'${stopName}')">↻ Actualiser</button></div><div>`;
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-size:12px;font-weight:600;color:var(--ink)">Prochains passages</div><div id="cdTimer" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);margin-top:2px">Màj ${ts} · 30s</div></div><button class="refbtn" onclick="loadDep('${stopId}',this.closest('[id]'),'${stopName}')"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Actualiser</button></div><div>`;
   Object.values(lines).sort((a,b) => (diffM(a.deps[0])??999)-(diffM(b.deps[0])??999)).forEach(line => {
     const mode=modeI(line.info), code=line.info.label||line.info.code||'?', dir=line.info.direction||code;
     const n1=line.deps[0]?fmtNext(line.deps[0]):{l:'--',c:'var(--ink-3)'};
@@ -2462,7 +2582,7 @@ function renderFavoritesIfEmpty() {
     html += '<div class="block-title">Tes favoris</div><div class="favs">';
     html += favorites.map((f,i) => {
       const label = (f.toLabel||'Trajet').replace(/'/g,"\\'");
-      return `<button class="fav-chip" onclick="launchFav(${i})"><span class="fav-star">★</span>${label}</button>`;
+      return `<button class="fav-chip" onclick="launchFav(${i})"><span class="fav-star"><svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>${label}</button>`;
     }).join('');
     html += '</div>';
   }
@@ -3003,7 +3123,7 @@ function renderSncfDep(data,container,stopName){
   const fmtNext=dt=>{const m=diffM(dt);if(m===null)return{l:'--',c:'var(--ink-3)'};if(m<=0)return{l:'À quai',c:'var(--green)',a:true};if(m<=5)return{l:`${m} min`,c:'var(--orange)'};return{l:fmtT(dt),c:'var(--blue)'};};
   if(!items.length){container.innerHTML='<div class="err">Aucun train dans les 2h.</div>';return;}
   const ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:14px;font-weight:700;color:var(--ink)">${stopName}</div><div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);margin-top:2px">Màj ${ts} · auto 60s</div></div><button class="refbtn" onclick="doSncfGare()">↻</button></div><div>`;
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:14px;font-weight:700;color:var(--ink)">${stopName}</div><div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--ink-3);margin-top:2px">Màj ${ts} · auto 60s</div></div><button class="refbtn" onclick="doSncfGare()"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div><div>`;
   items.forEach(item=>{
     const info=item.display_informations||{};
     const dt=sncfMode==='arr'?item.stop_date_time?.arrival_date_time:item.stop_date_time?.departure_date_time;
@@ -3077,12 +3197,244 @@ window.addEventListener('load', ()=>{setTimeout(()=>{try{map.resize();}catch(e){
 
 // PWA
 if ('serviceWorker' in navigator) {
-  // Force la mise à jour du SW et invalide le cache de l'ancienne version
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(r => r.update());
-  });
+  navigator.serviceWorker.getRegistrations().then(regs => { regs.forEach(r => r.update()); });
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=2').catch(() => {}));
 }
+
+// ═══════════════════════════════════════════════════════
+// ═══ SYSTÈME POI — Lucide icons + zoom intelligent ═══
+// ═══════════════════════════════════════════════════════
+
+const L_SHIELD   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const L_CROSS    = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg>`;
+const L_BANKNOTE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`;
+const L_REFRESH  = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
+const L_WALK     = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="13" cy="4" r="2"/><path d="M15 22V12l-4-4-4 6 4 2v6"/></svg>`;
+
+const POI_CONFIG = {
+  police: {
+    label:'Commissariats', amenity:'police',
+    minZoom: 14, maxItems: 15,
+    cls:'poi-police', chipCls:'poi-chip-police',
+    color:'#2255cc', icon: L_SHIELD
+  },
+  pharmacy: {
+    label:'Pharmacies', amenity:'pharmacy',
+    minZoom: 15, maxItems: 20,
+    cls:'poi-pharmacy', chipCls:'poi-chip-pharmacy',
+    color:'#00b87a', icon: L_CROSS
+  },
+  atm: {
+    label:'Distributeurs', amenity:'atm',
+    minZoom: 16, maxItems: 12,
+    cls:'poi-atm', chipCls:'poi-chip-atm',
+    color:'#d97000', icon: L_BANKNOTE
+  }
+};
+
+const poi = {
+  markers:  { police:[], pharmacy:[], atm:[] },
+  data:     { police:[], pharmacy:[], atm:[] },
+  enabled:  { police:true, pharmacy:true, atm:true },
+  fetchedAt: null,
+  lastZoom: null,
+  hintTimer: null,
+  sheetState: 'peek'
+};
+
+// Fetch depuis Overpass API OSM
+async function fetchPOIData(lat, lon, amenity, radius=1000) {
+  const q = `[out:json][timeout:12];node["amenity"="${amenity}"](around:${radius},${lat},${lon});out;`;
+  try {
+    const r = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`);
+    if (!r.ok) return [];
+    const d = await r.json();
+    return (d.elements||[]).map(e => ({
+      id: e.id, lat: e.lat, lon: e.lon,
+      name: e.tags?.name || e.tags?.['name:fr'] || null,
+      addr: e.tags?.['addr:street']
+        ? `${e.tags['addr:housenumber']||''} ${e.tags['addr:street']}`.trim()
+        : null,
+      phone: e.tags?.phone || e.tags?.['contact:phone'] || null,
+      opening: e.tags?.opening_hours || null
+    }));
+  } catch { return []; }
+}
+
+// Retire les marqueurs d'un type avec animation de sortie
+function clearPOIType(type) {
+  poi.markers[type].forEach(m => {
+    if (m._el) {
+      m._el.classList.add('removing');
+      setTimeout(() => m.remove(), 220);
+    } else { m.remove(); }
+  });
+  poi.markers[type] = [];
+}
+
+// Pose les marqueurs en fonction du zoom courant
+function renderPOIType(type) {
+  clearPOIType(type);
+  const cfg = POI_CONFIG[type];
+  const zoom = map.getZoom();
+  if (zoom < cfg.minZoom || !poi.enabled[type] || poi.sheetState === 'full') return;
+
+  const items = poi.data[type].slice(0, cfg.maxItems);
+  items.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = `poi-marker ${cfg.cls}`;
+    el.innerHTML = cfg.icon;
+    el.style.animationDelay = `${Math.min(i * 25, 280)}ms`;
+    el.setAttribute('aria-label', item.name || cfg.label);
+
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      // Centrer la carte sur le POI
+      map.easeTo({ center:[item.lon, item.lat], zoom: Math.max(map.getZoom(), 17), duration: 480, easing: t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t });
+      // Afficher une notif avec les infos
+      const sub = item.addr || (item.opening ? item.opening : cfg.label);
+      showNotif('ok', item.name || cfg.label, sub, 3500);
+    });
+
+    const m = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([item.lon, item.lat])
+      .addTo(map);
+    m._el = el;
+    poi.markers[type].push(m);
+  });
+}
+
+// Logique de zoom — plus on zoome, plus on affiche
+function updatePOIVisibility() {
+  const zoom = map.getZoom();
+  if (zoom === poi.lastZoom) return;
+  poi.lastZoom = zoom;
+
+  Object.keys(POI_CONFIG).forEach(type => {
+    const cfg = POI_CONFIG[type];
+    const shouldShow = zoom >= cfg.minZoom && poi.enabled[type] && poi.sheetState !== 'full';
+    const hasMarkers = poi.markers[type].length > 0;
+    if (shouldShow && !hasMarkers && poi.data[type].length > 0) renderPOIType(type);
+    else if (!shouldShow && hasMarkers) clearPOIType(type);
+  });
+
+  // Chips : griser celles dont le niveau de zoom est insuffisant
+  Object.keys(POI_CONFIG).forEach(type => {
+    const cfg = POI_CONFIG[type];
+    const chip = document.getElementById(`poi-chip-${type}`);
+    if (chip) chip.classList.toggle('dimmed', zoom < cfg.minZoom - 0.5);
+  });
+
+  // Zoom hint : indique le prochain layer disponible
+  const nextLayer = Object.values(POI_CONFIG)
+    .filter(c => zoom < c.minZoom - 0.5)
+    .sort((a,b) => a.minZoom - b.minZoom)[0];
+
+  const hint = document.getElementById('poiZoomHint');
+  if (hint && nextLayer && zoom >= 12) {
+    hint.textContent = `Zoomez pour voir les ${nextLayer.label.toLowerCase()}`;
+    hint.classList.add('show');
+    clearTimeout(poi.hintTimer);
+    poi.hintTimer = setTimeout(() => hint.classList.remove('show'), 2800);
+  } else if (hint) { hint.classList.remove('show'); }
+}
+
+// Charge les données POI pour la zone visible
+async function loadPOIForArea() {
+  const center = map.getCenter();
+  const lat = center.lat, lon = center.lng;
+
+  // Éviter un re-fetch si on n'a pas bougé de plus de 500m
+  if (poi.fetchedAt) {
+    const d = distM(lat, lon, poi.fetchedAt.lat, poi.fetchedAt.lon);
+    if (d < 500) { updatePOIVisibility(); return; }
+  }
+  poi.fetchedAt = { lat, lon };
+
+  // Fetch en parallèle, zoom-gated (pas la peine de fetch les ATM si zoom < 16)
+  const zoom = map.getZoom();
+  await Promise.allSettled(
+    Object.entries(POI_CONFIG).map(async ([type, cfg]) => {
+      if (zoom < cfg.minZoom - 2) return; // skip si trop loin du seuil
+      poi.data[type] = await fetchPOIData(lat, lon, cfg.amenity);
+    })
+  );
+  updatePOIVisibility();
+}
+
+// Toggle d'un layer POI depuis les chips
+function togglePOILayer(type) {
+  poi.enabled[type] = !poi.enabled[type];
+  const chip = document.getElementById(`poi-chip-${type}`);
+  if (chip) chip.classList.toggle('active', poi.enabled[type]);
+  if (poi.enabled[type]) renderPOIType(type);
+  else clearPOIType(type);
+}
+
+// Met à jour la position des chips selon l'état de la sheet
+function updatePOIChipsPosition(state) {
+  poi.sheetState = state;
+  const chips = document.getElementById('poiChips');
+  if (!chips) return;
+  if (state === 'full') {
+    chips.style.opacity = '0';
+    chips.style.pointerEvents = 'none';
+  } else {
+    chips.style.opacity = '1';
+    chips.style.pointerEvents = '';
+    const sheetH = state === 'mid'
+      ? Math.round(window.innerHeight * 0.54)
+      : 84; // peek
+    chips.style.bottom = (sheetH + 10) + 'px';
+  }
+  // En état full, cacher les markers aussi
+  if (state === 'full') {
+    Object.keys(POI_CONFIG).forEach(t => clearPOIType(t));
+  } else {
+    updatePOIVisibility();
+  }
+}
+
+// Init du système POI (appelé après map.on('load'))
+function initPOISystem() {
+  // Conteneur chips
+  const chipsEl = document.createElement('div');
+  chipsEl.className = 'poi-chips';
+  chipsEl.id = 'poiChips';
+
+  Object.entries(POI_CONFIG).forEach(([type, cfg]) => {
+    const chip = document.createElement('button');
+    chip.className = `poi-chip ${cfg.chipCls} active`;
+    chip.id = `poi-chip-${type}`;
+    chip.innerHTML = `${cfg.icon}<span>${cfg.label}</span>`;
+    chip.addEventListener('click', () => togglePOILayer(type));
+    chipsEl.appendChild(chip);
+  });
+  document.body.appendChild(chipsEl);
+
+  // Zoom hint
+  const hintEl = document.createElement('div');
+  hintEl.className = 'zoom-hint';
+  hintEl.id = 'poiZoomHint';
+  document.body.appendChild(hintEl);
+
+  // Listeners carte
+  map.on('zoomend', updatePOIVisibility);
+  map.on('moveend', loadPOIForArea);
+
+  // Premier chargement (après quelques secondes pour ne pas bloquer le rendu)
+  setTimeout(loadPOIForArea, 1800);
+}
+
+// Patch setSheetState pour synchroniser les chips POI
+const _origSetSheetState = setSheetState;
+window.setSheetState = function(state) {
+  _origSetSheetState.call(this, state);
+  updatePOIChipsPosition(state);
+};
+
+// Lancement après le chargement de la carte
+map.once('idle', initPOISystem);
 </script>
 </body>
 </html>
