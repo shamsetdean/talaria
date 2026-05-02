@@ -1142,6 +1142,161 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 .dm-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .16s; }
 .dm-opt.selected .dm-check { background: var(--blue); border-color: var(--blue); }
 .dm-opt.selected .dm-check::after { content: ''; display: block; width: 5px; height: 9px; border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-2px); }
+
+/* ═══ TRANSPORT MODE SELECTOR ═══ */
+.tmode-selector {
+  display: flex; gap: 6px; margin-bottom: 10px;
+}
+.tmode-pill {
+  flex: 1; background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 14px; padding: 11px 6px;
+  font-size: 12px; font-weight: 600;
+  color: var(--ink-3); font-family: inherit;
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; gap: 5px;
+  transition: all .18s cubic-bezier(.32,.72,0,1);
+  -webkit-tap-highlight-color: transparent;
+}
+.tmode-pill svg { width: 20px; height: 20px; }
+.tmode-pill:active { transform: scale(.94); }
+.tmode-pill.active { color: #fff; border-color: transparent; }
+.tmode-pill.active[data-mode="transit"] { background: var(--blue); }
+.tmode-pill.active[data-mode="walk"]    { background: var(--green); }
+.tmode-pill.active[data-mode="bike"]    { background: var(--orange); }
+
+/* ═══ MÉTÉO CYCLIQUE ═══ */
+.env-cycle-item { display: inline-flex; align-items: center; gap: 6px; }
+.env-cycle-item svg { width: 13px; height: 13px; }
+#env-bar { transition: opacity .25s ease; }
+#env-bar.fading { opacity: 0 !important; }
+
+/* ═══ COUCHES PANEL ═══ */
+.layers-panel {
+  position: fixed;
+  top: calc(12px + var(--safe-top)); right: 14px;
+  z-index: 300;
+  width: 220px;
+  background: rgba(9,10,20,0.96);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  backdrop-filter: blur(40px) saturate(200%);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  overflow: hidden;
+  transform: translateX(calc(100% + 20px));
+  transition: transform .38s cubic-bezier(.32,.72,0,1), opacity .2s;
+  opacity: 0; pointer-events: none;
+}
+.layers-panel.open {
+  transform: translateX(0); opacity: 1; pointer-events: auto;
+}
+.lp-header {
+  padding: 14px 16px 10px;
+  font-size: 12px; font-weight: 700;
+  color: var(--ink-3); letter-spacing: .08em; text-transform: uppercase;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+.lp-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  cursor: pointer; transition: background .14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.lp-row:last-child { border-bottom: none; }
+.lp-row:active { background: rgba(255,255,255,0.06); }
+.lp-dot { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lp-dot svg { width: 16px; height: 16px; stroke: #fff; }
+.lp-label { flex: 1; font-size: 13px; font-weight: 500; color: var(--ink); }
+.lp-toggle {
+  width: 38px; height: 22px; border-radius: 11px;
+  background: rgba(255,255,255,0.12); position: relative;
+  transition: background .2s; flex-shrink: 0;
+  border: none; cursor: pointer; padding: 0;
+}
+.lp-toggle::after {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; border-radius: 9px;
+  background: #fff; top: 2px; left: 2px;
+  transition: transform .22s cubic-bezier(.32,.72,0,1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.lp-toggle.on { background: var(--blue); }
+.lp-toggle.on::after { transform: translateX(16px); }
+
+/* ═══ 3D MODE — DEPTH EFFECTS ═══ */
+.map-3d-active .ovl-tl,
+.map-3d-active .ovl-tr {
+  will-change: transform;
+}
+.map-3d-active .logo,
+.map-3d-active .capsule,
+.map-3d-active .map-actions {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 2px 0 rgba(255,255,255,0.06) inset;
+}
+
+/* ═══ AR HUD FUTURISTE ═══ */
+#arOverlay { background: transparent; }
+#arGrid {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image:
+    linear-gradient(rgba(68,136,255,0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(68,136,255,0.8) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 8s linear infinite;
+}
+@keyframes gridMove { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+
+#arScanLine {
+  position: absolute; left: 0; right: 0; height: 2px; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(68,136,255,0.8), transparent);
+  pointer-events: none;
+  animation: scanLine 3s ease-in-out infinite;
+}
+@keyframes scanLine {
+  0%   { top: 0%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+#arPlaceInfo {
+  position: absolute;
+  top: calc(70px + var(--safe-top)); left: 16px; right: 16px;
+  z-index: 2;
+  background: rgba(7,8,15,0.75);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(68,136,255,0.3);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: none;
+  animation: slideDown .35s cubic-bezier(.32,.72,0,1);
+}
+@keyframes slideDown { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+#arPlaceName { font-size: 14px; font-weight: 700; color: #fff; }
+#arPlaceSub  { font-size: 11px; color: rgba(68,136,255,0.9); font-family: 'JetBrains Mono',monospace; margin-top: 2px; }
+
+#arStats {
+  position: absolute;
+  bottom: calc(120px + var(--safe-bot)); left: 16px; right: 16px;
+  z-index: 2;
+  display: flex; gap: 8px;
+}
+.ar-stat {
+  flex: 1; background: rgba(7,8,15,0.75);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 10px 12px;
+  text-align: center;
+}
+.ar-stat-val { font-size: 18px; font-weight: 800; color: var(--blue); font-family: 'JetBrains Mono',monospace; }
+.ar-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
 </style>
 </head>
 <body>
@@ -1150,6 +1305,14 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
 
 <!-- AR Overlay -->
 <div id="arOverlay">
+  <div id="arGrid"></div>
+  <div id="arScanLine"></div>
+  <div id="arPlaceInfo"><div id="arPlaceName"></div><div id="arPlaceSub"></div></div>
+  <div id="arStats" style="display:none">
+    <div class="ar-stat"><div class="ar-stat-val" id="arStatDist">--</div><div class="ar-stat-lbl">mètres</div></div>
+    <div class="ar-stat"><div class="ar-stat-val" id="arStatTime">--</div><div class="ar-stat-lbl">minutes</div></div>
+    <div class="ar-stat"><div class="ar-stat-val" id="arStatBear">--</div><div class="ar-stat-lbl">cap °</div></div>
+  </div>
   <video id="arVideo" autoplay muted playsinline></video>
   <canvas id="arCanvas"></canvas>
   <div id="arHeader">
@@ -1193,6 +1356,9 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
   <div class="map-actions" id="mapbtns">
     <button class="mapbtn" id="locBtn" onclick="doLocate()" title="Me localiser">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+    </button>
+    <button class="mapbtn" id="layersBtn" onclick="toggleLayersPanel()" title="Couches de carte">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
     </button>
     <span class="mapbtn-sep"></span>
     <button class="mapbtn" id="btn3D" onclick="toggle3D()" title="Vue 3D">
@@ -1266,6 +1432,26 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
   <button onclick="hideNotif()" style="background:transparent;border:none;color:var(--ink-3);font-size:18px;cursor:pointer;padding:0 4px;flex-shrink:0">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
+</div>
+
+<!-- COUCHES PANEL -->
+<div class="layers-panel" id="layersPanel">
+  <div class="lp-header">Couches de carte</div>
+  <div class="lp-row" onclick="toggleLP('police')">
+    <div class="lp-dot" style="background:#2255cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <span class="lp-label">Commissariats</span>
+    <button class="lp-toggle on" id="lp-toggle-police"></button>
+  </div>
+  <div class="lp-row" onclick="toggleLP('pharmacy')">
+    <div class="lp-dot" style="background:#00b87a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg></div>
+    <span class="lp-label">Pharmacies</span>
+    <button class="lp-toggle on" id="lp-toggle-pharmacy"></button>
+  </div>
+  <div class="lp-row" onclick="toggleLP('atm')">
+    <div class="lp-dot" style="background:#d97000"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div>
+    <span class="lp-label">Distributeurs</span>
+    <button class="lp-toggle on" id="lp-toggle-atm"></button>
+  </div>
 </div>
 
 <!-- MODAL ONBOARDING — CHOIX AFFICHAGE -->
@@ -1353,6 +1539,21 @@ textarea { width: 100%; background: var(--b-1); border: 0.5px solid var(--bd-1);
           <div class="ac" id="ac-to"></div>
           <button class="swap-btn" onclick="swapInputs()" title="Inverser">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 10l-4-4 4-4M3 6h18M17 14l4 4-4 4M21 18H3"/></svg>
+          </button>
+        </div>
+        <!-- Modes de transport -->
+        <div class="tmode-selector" id="tmodeSelector">
+          <button class="tmode-pill active" data-mode="transit" onclick="setTransportMode('transit')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 13h18M8 7V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M8 20v2M16 20v2"/></svg>
+            Transit
+          </button>
+          <button class="tmode-pill" data-mode="walk" onclick="setTransportMode('walk')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="13" cy="4" r="2"/><path d="M15 22V12l-4-4-4 6 4 2v6"/><path d="M9 22h6"/></svg>
+            À pied
+          </button>
+          <button class="tmode-pill" data-mode="bike" onclick="setTransportMode('bike')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1M9 17.5l3-5.5 3-2 2-4H9.5L8 9.5"/><path d="M12 12l3 5.5"/></svg>
+            Vélo
           </button>
         </div>
         <button class="btn" id="routeBtn" onclick="doRoute()">Calculer l'itinéraire <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
@@ -1637,12 +1838,24 @@ function toggle3D() {
   is3D = !is3D;
   const btn = document.getElementById('btn3D');
   if (is3D) {
-    map.easeTo({ pitch: 52, bearing: -10, duration: 800 });
+    // Animation d'entrée en 3D: d'abord pitch, puis léger bearing
+    map.easeTo({ pitch: 62, bearing: -15, duration: 1000, easing: t => t < .5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 });
     if (btn) btn.classList.add('mode-3d-on');
-    showNotif('ok', 'Vue 3D activée', 'Inclinez la carte');
+    document.body.classList.add('map-3d-active');
+    // Légère rotation automatique subtile
+    if (_3dAutoRotate) clearInterval(_3dAutoRotate);
+    let _bearing = -15;
+    _3dAutoRotate = setInterval(() => {
+      if (!is3D) { clearInterval(_3dAutoRotate); return; }
+      _bearing = ((_bearing + 0.05) % 360);
+      map.setBearing(_bearing);
+    }, 50);
+    showNotif('ok', 'Vue 3D', 'Rotation automatique activée');
   } else {
-    map.easeTo({ pitch: 0, bearing: 0, duration: 600 });
+    if (_3dAutoRotate) { clearInterval(_3dAutoRotate); _3dAutoRotate = null; }
+    map.easeTo({ pitch: 0, bearing: 0, duration: 700, easing: t => t < .5 ? 2*t*t : -1+(4-2*t)*t });
     if (btn) btn.classList.remove('mode-3d-on');
+    document.body.classList.remove('map-3d-active');
   }
 }
 
@@ -1837,14 +2050,33 @@ function startARRender() {
   frame();
 }
 
+// AR : fetch lieu via Nominatim
+let _arLastPlaceFetch = 0;
+async function fetchARPlaceInfo(lat, lon) {
+  if (Date.now() - _arLastPlaceFetch < 8000) return;
+  _arLastPlaceFetch = Date.now();
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=18&addressdetails=1&accept-language=fr`);
+    const d = await r.json();
+    const name = d.address?.road || d.name || d.display_name?.split(',')[0] || '';
+    const sub  = [d.address?.suburb || d.address?.quarter || '', d.address?.city || d.address?.town || ''].filter(Boolean).join(' · ');
+    const el = document.getElementById('arPlaceInfo');
+    if (el && name) {
+      document.getElementById('arPlaceName').textContent = name;
+      document.getElementById('arPlaceSub').textContent  = sub;
+      el.style.display = 'block';
+    }
+  } catch {}
+}
+
 function drawARDirectionIndicator(ctx, W, H) {
   const t = Date.now() / 1000;
   const j = currentTrip.journey;
   const sections = (j.sections || []).filter(s => s.type !== 'waiting');
   const nextTransport = sections.find(s => modeOf(s) !== 'WALK');
 
-  // Calculer direction vers la prochaine section
-  let bearing = arOrientation.alpha; // Fallback: nord
+  // Calcul bearing
+  let bearing = arOrientation.alpha;
   if (nextTransport?.geojson?.coordinates?.length > 1) {
     const [lon1, lat1] = nextTransport.geojson.coordinates[0];
     const [lon2, lat2] = nextTransport.geojson.coordinates[1];
@@ -1857,100 +2089,159 @@ function drawARDirectionIndicator(ctx, W, H) {
 
   const relBearing = ((bearing - arOrientation.alpha) + 360) % 360;
   const angleRad = (relBearing - 90) * Math.PI / 180;
-  const cx = W / 2, cy = H / 2 - 40;
-  const R = 80;
-
-  // Halo pulsant
+  const cx = W / 2, cy = H / 2 - 20;
+  const R = Math.min(W, H) * 0.22;
   const pulse = 0.5 + 0.5 * Math.sin(t * 2.5);
-  ctx.beginPath();
-  ctx.arc(cx, cy, R + 20 + pulse * 15, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(68,136,255,${0.04 + pulse * 0.04})`;
-  ctx.fill();
+  const spin  = 0.5 + 0.5 * Math.sin(t * 0.8);
 
-  // Cercle fond
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(7,8,15,0.55)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(68,136,255,0.4)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // ── Anneaux concentriques rotatifs
+  for (let i = 0; i < 4; i++) {
+    const rr = R + i * 28 + pulse * 8;
+    const rot = t * (i % 2 === 0 ? 0.4 : -0.3);
+    ctx.save();
+    ctx.translate(cx, cy); ctx.rotate(rot);
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, -Math.PI * 0.15, Math.PI * 0.15);
+    ctx.strokeStyle = `rgba(68,136,255,${0.35 - i * 0.07})`;
+    ctx.lineWidth = i === 0 ? 2 : 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, Math.PI * 0.85, Math.PI * 1.15);
+    ctx.stroke();
+    ctx.restore();
+  }
 
-  // Arc de progression (directionnel)
-  const arcStart = angleRad - 0.4, arcEnd = angleRad + 0.4;
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, arcStart, arcEnd);
-  ctx.strokeStyle = '#4488ff';
-  ctx.lineWidth = 4;
-  ctx.shadowColor = '#4488ff';
-  ctx.shadowBlur = 12;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
+  // ── Cercle principal semi-transparent
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  grad.addColorStop(0, 'rgba(7,8,15,0.72)');
+  grad.addColorStop(1, 'rgba(7,8,15,0.45)');
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.strokeStyle = `rgba(68,136,255,${0.3 + spin * 0.2})`; ctx.lineWidth = 1.5; ctx.stroke();
 
-  // Flèche directionnelle
-  const arrowX = cx + Math.cos(angleRad) * (R - 12);
-  const arrowY = cy + Math.sin(angleRad) * (R - 12);
+  // ── Arc directionnel large
+  const arcW = 0.6;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, angleRad - arcW, angleRad + arcW);
+  ctx.strokeStyle = '#4488ff'; ctx.lineWidth = 5;
+  ctx.shadowColor = '#4488ff'; ctx.shadowBlur = 20; ctx.stroke(); ctx.shadowBlur = 0;
+
+  // ── Flèche 3D : triangle + base + traînée
   ctx.save();
-  ctx.translate(arrowX, arrowY);
+  ctx.translate(cx + Math.cos(angleRad) * (R + 18), cy + Math.sin(angleRad) * (R + 18));
   ctx.rotate(angleRad + Math.PI / 2);
+  // Traînée
+  for (let i = 1; i <= 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, -24 + i * 4); ctx.lineTo(10 - i * 1.5, 8); ctx.lineTo(-10 + i * 1.5, 8);
+    ctx.fillStyle = `rgba(68,136,255,${0.15 - i * 0.03})`;
+    ctx.fill();
+  }
+  // Corps de la flèche
   ctx.beginPath();
-  ctx.moveTo(0, -14);
-  ctx.lineTo(8, 8);
-  ctx.lineTo(0, 4);
-  ctx.lineTo(-8, 8);
+  ctx.moveTo(0, -24); ctx.lineTo(12, 10); ctx.lineTo(0, 5); ctx.lineTo(-12, 10);
   ctx.closePath();
-  ctx.fillStyle = '#4488ff';
-  ctx.shadowColor = '#4488ff';
-  ctx.shadowBlur = 10;
-  ctx.fill();
-  ctx.restore();
+  ctx.fillStyle = '#4488ff'; ctx.shadowColor = '#4488ff'; ctx.shadowBlur = 18; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.restore(); ctx.shadowBlur = 0;
+
+  // ── Chevrons animés dans la direction
+  for (let i = 0; i < 3; i++) {
+    const phase = (t * 1.8 + i * 0.4) % 1.2;
+    const dist2 = R * 0.35 + phase * R * 0.55;
+    const alpha = 1 - phase / 1.2;
+    ctx.save();
+    ctx.translate(cx + Math.cos(angleRad) * dist2, cy + Math.sin(angleRad) * dist2);
+    ctx.rotate(angleRad + Math.PI / 2);
+    ctx.beginPath();
+    ctx.moveTo(-7, -4); ctx.lineTo(0, 5); ctx.lineTo(7, -4);
+    ctx.strokeStyle = `rgba(68,136,255,${alpha * 0.8})`;
+    ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── Code transport au centre
+  const mode = nextTransport ? modeOf(nextTransport) : 'WALK';
+  const code = nextTransport?.display_informations?.label || '';
+  ctx.font = `800 ${mode === 'WALK' ? 32 : 24}px JetBrains Mono, monospace`;
+  ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(68,136,255,0.6)'; ctx.shadowBlur = 8;
+  ctx.fillText(mode === 'WALK' ? '↑' : (code || mode.slice(0,3)), cx, cy);
   ctx.shadowBlur = 0;
 
-  // Mode de transport au centre
-  const mode = nextTransport ? modeOf(nextTransport) : 'WALK';
-  const code = nextTransport?.display_informations?.label || mode;
-  ctx.font = 'bold 22px JetBrains Mono, monospace';
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(mode === 'WALK' ? '↑' : code, cx, cy);
+  // ── Stats AR
+  const statsEl = document.getElementById('arStats');
+  if (statsEl && nextTransport?.geojson?.coordinates?.length) {
+    statsEl.style.display = 'flex';
+    const coords = nextTransport.geojson.coordinates;
+    const [lon0, lat0] = coords[0];
+    const dM = userPos ? distM(userPos.lat, userPos.lon, lat0, lon0) : 0;
+    document.getElementById('arStatDist').textContent = dM < 1000 ? Math.round(dM) : (dM/1000).toFixed(1)+'k';
+    document.getElementById('arStatTime').textContent = Math.round(dM / 80) || '--';
+    document.getElementById('arStatBear').textContent = Math.round(bearing);
+  }
+
+  // Fetch lieu périodiquement
+  if (userPos) fetchARPlaceInfo(userPos.lat, userPos.lon);
 }
 
 function drawARScanCircle(ctx, W, H) {
   const t = Date.now() / 1000;
-  const cx = W / 2, cy = H / 2 - 40;
+  const cx = W / 2, cy = H / 2 - 20;
   const pulse = 0.5 + 0.5 * Math.sin(t * 1.8);
 
-  // Cercles concentriques pulsants
-  [120, 90, 60].forEach((r, i) => {
-    const alpha = (0.06 - i * 0.015) + pulse * 0.04;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r + pulse * 8, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(68,136,255,${alpha})`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
+  // Cercles pulsants multi-couches
+  [140, 105, 75, 48].forEach((r, i) => {
+    const rr = r + pulse * (6 - i);
+    ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(68,136,255,${0.08 - i * 0.015 + pulse * 0.03})`;
+    ctx.lineWidth = i === 0 ? 1.5 : 1; ctx.stroke();
   });
 
-  // Ligne de scan qui tourne
-  const scanAngle = t * 1.5;
+  // Secteur de scan rotatif
+  const scanA = t * 2.2;
+  const sweepAngle = Math.PI * 0.55;
+  const scanGrad = ctx.createConicalGradient ? null : null; // fallback
+  ctx.save(); ctx.translate(cx, cy);
   ctx.beginPath();
-  ctx.moveTo(cx, cy);
-  const grad = ctx.createLinearGradient(cx, cy, cx + Math.cos(scanAngle) * 100, cy + Math.sin(scanAngle) * 100);
-  grad.addColorStop(0, 'rgba(68,136,255,0.6)');
-  grad.addColorStop(1, 'rgba(68,136,255,0)');
-  ctx.strokeStyle = grad;
-  ctx.lineWidth = 2;
-  ctx.lineTo(cx + Math.cos(scanAngle) * 90, cy + Math.sin(scanAngle) * 90);
-  ctx.stroke();
+  ctx.moveTo(0, 0);
+  ctx.arc(0, 0, 130, scanA, scanA + sweepAngle);
+  ctx.closePath();
+  const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, 130);
+  sg.addColorStop(0, 'rgba(68,136,255,0.18)');
+  sg.addColorStop(1, 'rgba(68,136,255,0)');
+  ctx.fillStyle = sg; ctx.fill();
+  ctx.restore();
 
-  // Point central
-  ctx.beginPath();
-  ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-  ctx.fillStyle = '#4488ff';
-  ctx.shadowColor = '#4488ff';
-  ctx.shadowBlur = 16;
-  ctx.fill();
+  // Ligne de scan principale
+  ctx.save(); ctx.translate(cx, cy);
+  const lg = ctx.createLinearGradient(0, 0, Math.cos(scanA) * 130, Math.sin(scanA) * 130);
+  lg.addColorStop(0, 'rgba(68,136,255,0.9)'); lg.addColorStop(1, 'rgba(68,136,255,0)');
+  ctx.beginPath(); ctx.moveTo(0, 0);
+  ctx.lineTo(Math.cos(scanA) * 130, Math.sin(scanA) * 130);
+  ctx.strokeStyle = lg; ctx.lineWidth = 2; ctx.stroke();
+  ctx.restore();
+
+  // Croix centrale (crosshair HUD)
+  const chLen = 18, chGap = 7;
+  [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx, dy]) => {
+    ctx.beginPath();
+    ctx.moveTo(cx + dx * chGap, cy + dy * chGap);
+    ctx.lineTo(cx + dx * (chGap + chLen), cy + dy * (chGap + chLen));
+    ctx.strokeStyle = `rgba(68,136,255,${0.6 + pulse * 0.3})`;
+    ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  // Point central pulsant
+  ctx.beginPath(); ctx.arc(cx, cy, 5 + pulse * 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#4488ff'; ctx.shadowColor = '#4488ff'; ctx.shadowBlur = 20; ctx.fill();
   ctx.shadowBlur = 0;
+
+  // Texte "SCAN EN COURS"
+  ctx.font = '600 11px JetBrains Mono, monospace';
+  ctx.fillStyle = `rgba(68,136,255,${0.5 + pulse * 0.3})`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('SCAN EN COURS', cx, cy + 155);
 }
 
 function updateARInstruction() {
@@ -2241,6 +2532,22 @@ async function doRoute() {
   const out     = document.getElementById('route-out');
   const btn     = document.getElementById('routeBtn');
   if (!fromVal || !toVal) { out.innerHTML = '<div class="err">Renseignez départ et arrivée.</div>'; return; }
+
+  // Modes piéton et vélo : calcul direct sans Navitia
+  if (transportMode === 'walk' || transportMode === 'bike') {
+    btn.disabled = true;
+    out.innerHTML = '<div class="loader"><div class="spin"></div>Calcul en cours…</div>';
+    try {
+      let fc = fromCoordStored;
+      if (!fc) { if (fromVal.length <= 2) throw new Error('Départ invalide.'); fc = await geo(fromVal); }
+      const tc = await geo(toVal);
+      window._routeCtx = { fromVal, toVal, fc, tc, dist: distM(fc.lat, fc.lon, tc.lat, tc.lon) };
+      showWalkBikeResult(fc, tc, transportMode);
+    } catch(e) { out.innerHTML = `<div class="err">${e.message}</div>`; }
+    btn.disabled = false;
+    return;
+  }
+
   btn.disabled = true;
   out.innerHTML = '<div class="loader"><div class="spin"></div>Calcul de l\'itinéraire…</div>';
   document.getElementById('opt-pills').style.display = 'none';
@@ -3077,8 +3384,10 @@ let weatherData=null, aqiData=null;
 async function fetchWeather(lat,lon) {
   try {
     const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,weathercode,windspeed_10m&hourly=precipitation_probability&forecast_days=1&timezone=Europe%2FParis`);
-    const d=await r.json(); weatherData=d.current; renderEnvBar();
-    const rain=d.current?.precipitation||0, rainProb=d.hourly?.precipitation_probability?.[new Date().getHours()]||0;
+    const d=await r.json(); weatherData=d.current;
+    if (weatherData) weatherData._rainProb=d.hourly?.precipitation_probability?.[new Date().getHours()]||0;
+    renderEnvBar();
+    const rain=d.current?.precipitation||0, rainProb=weatherData?._rainProb||0;
     if (rain>1||rainProb>70) showNotif('warn','Pluie détectée',`${rain}mm · prévoyez un parapluie`);
   } catch(e){}
 }
@@ -3098,20 +3407,62 @@ function getAqiLabel(aqi) {
   if (aqi<=60) return {label:'Moyen',color:'#ff9f43'};
   return {label:'Mauvais',color:'#ff4757'};
 }
-function renderEnvBar() {
-  const bar=document.getElementById('env-bar');
-  if (!bar) return;
-  const items=[];
-  if (weatherData) {
-    const temp=Math.round(weatherData.temperature_2m||0);
-    items.push(`<span class="env-item">${getWeatherIcon(weatherData.weathercode||0)} ${temp}°C</span>`);
-    if ((weatherData.precipitation||0)>0.5) items.push(`<span class="env-item" style="color:var(--blue)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="17" x2="12" y2="23"/><line x1="16" y1="19" x2="16" y2="21"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg> ${weatherData.precipitation}mm</span>`);
-  }
+// ═══ MÉTÉO CYCLIQUE ═══
+let _weatherCycleItems = [];
+let _weatherCycleIdx = 0;
+let _weatherCycleTimer = null;
+
+function buildWeatherItems() {
+  _weatherCycleItems = [];
+  if (!weatherData) return;
+  const temp = Math.round(weatherData.temperature_2m || 0);
+  const wind = Math.round(weatherData.windspeed_10m || 0);
+  const rain = weatherData._rainProb || 0;
+  const wcode = weatherData.weathercode || 0;
+
+  // Item 1 : Température
+  _weatherCycleItems.push(
+    `<span class="env-cycle-item">${getWeatherIcon(wcode)}<span>${temp}°C</span></span>`
+  );
+  // Item 2 : Pluie
+  _weatherCycleItems.push(
+    `<span class="env-cycle-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="17" x2="12" y2="23"/><line x1="16" y1="19" x2="16" y2="21"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg><span style="color:var(--blue)">${rain}% pluie</span></span>`
+  );
+  // Item 3 : Vent
+  _weatherCycleItems.push(
+    `<span class="env-cycle-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg><span style="color:var(--ink-3)">${wind} km/h</span></span>`
+  );
+  // Item 4 : AQI
   if (aqiData) {
-    const q=getAqiLabel(Math.round(aqiData.european_aqi||0));
-    items.push(`<span class="env-item" style="color:${q.color}">${q.label}</span>`);
+    const q = getAqiLabel(Math.round(aqiData.european_aqi || 0));
+    _weatherCycleItems.push(
+      `<span class="env-cycle-item"><span style="width:7px;height:7px;border-radius:50%;background:${q.color};display:inline-block;flex-shrink:0"></span><span style="color:${q.color}">${q.label}</span></span>`
+    );
   }
-  if (items.length) { bar.innerHTML=items.join(''); bar.style.display='flex'; }
+}
+
+function cycleWeatherDisplay() {
+  const bar = document.getElementById('env-bar');
+  if (!bar || !_weatherCycleItems.length) return;
+  bar.classList.add('fading');
+  setTimeout(() => {
+    _weatherCycleIdx = (_weatherCycleIdx + 1) % _weatherCycleItems.length;
+    bar.innerHTML = _weatherCycleItems[_weatherCycleIdx];
+    bar.style.display = 'flex';
+    bar.classList.remove('fading');
+  }, 260);
+}
+
+function renderEnvBar() {
+  const bar = document.getElementById('env-bar');
+  if (!bar) return;
+  buildWeatherItems();
+  if (!_weatherCycleItems.length) return;
+  _weatherCycleIdx = 0;
+  bar.innerHTML = _weatherCycleItems[0];
+  bar.style.display = 'flex';
+  if (_weatherCycleTimer) clearInterval(_weatherCycleTimer);
+  _weatherCycleTimer = setInterval(cycleWeatherDisplay, 3200);
 }
 
 // ═══ DISRUPTIONS ═══
@@ -3357,6 +3708,91 @@ window.addEventListener('load', ()=>{setTimeout(()=>{try{map.resize();}catch(e){
   }
   fetchDisruptions();
 })();
+
+
+// ═══ TRANSPORT MODES ═══
+let transportMode = 'transit';
+
+function setTransportMode(mode) {
+  transportMode = mode;
+  document.querySelectorAll('.tmode-pill').forEach(p =>
+    p.classList.toggle('active', p.dataset.mode === mode)
+  );
+  // Met à jour le placeholder du bouton
+  const btn = document.getElementById('routeBtn');
+  const labels = { transit: 'Calculer l'itinéraire', walk: 'Calculer à pied', bike: 'Calculer à vélo' };
+  if (btn) btn.childNodes[0].textContent = labels[mode] + ' ';
+}
+
+// Résultat piéton
+function showWalkBikeResult(fc, tc, mode) {
+  const out = document.getElementById('route-out');
+  const dist = distM(fc.lat, fc.lon, tc.lat, tc.lon);
+  const speed = mode === 'bike' ? 250 : 80; // m/min
+  const dur = Math.round(dist / speed);
+  const km = (dist / 1000).toFixed(1);
+  const modeColor = mode === 'bike' ? 'var(--orange)' : 'var(--green)';
+  const modeIcon = mode === 'bike'
+    ? '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 0 0-1-1h-1M9 17.5l3-5.5 3-2 2-4H9.5L8 9.5"/><path d="M12 12l3 5.5"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="13" cy="4" r="2"/><path d="M15 22V12l-4-4-4 6 4 2v6"/></svg>';
+  const label = mode === 'bike' ? 'À vélo' : 'À pied';
+  const sublabel = mode === 'bike' ? 'Itinéraire cyclable estimé · Vélib' disponibles' : 'Itinéraire piéton direct';
+
+  out.innerHTML = `<div class="jlist"><div class="jcard best">
+    <div class="jhead">
+      <div class="jdur-block">
+        <div class="jdur">${dur}<span class="jdur-unit">min</span></div>
+        <div class="jmeta">
+          <span class="jbadge" style="background:rgba(0,0,0,0.12);color:${modeColor}">${modeIcon}&nbsp;${label}</span>
+        </div>
+      </div>
+      <div class="jright">
+        <div class="jtimes">${km} km</div>
+        <div class="jarr">${sublabel}</div>
+      </div>
+    </div>
+    <div class="jpills">
+      <span class="pill ${mode === 'bike' ? 'TRAM' : 'WALK'}">${label}</span>
+    </div>
+  </div></div>`;
+
+  // Dessiner la route en ligne directe
+  drawWalkRoute(fc, tc);
+  setSheetState('mid');
+  out.dataset.calculated = '1';
+}
+
+// ═══ LAYERS PANEL ═══
+let _layersPanelOpen = false;
+function toggleLayersPanel() {
+  _layersPanelOpen = !_layersPanelOpen;
+  const panel = document.getElementById('layersPanel');
+  const btn = document.getElementById('layersBtn');
+  panel.classList.toggle('open', _layersPanelOpen);
+  if (btn) btn.classList.toggle('on', _layersPanelOpen);
+  // Fermer si clic extérieur
+  if (_layersPanelOpen) {
+    setTimeout(() => {
+      document.addEventListener('click', closePanelOnOutside, { once: true });
+    }, 50);
+  }
+}
+function closePanelOnOutside(e) {
+  if (!document.getElementById('layersPanel').contains(e.target) &&
+      e.target.id !== 'layersBtn') {
+    _layersPanelOpen = false;
+    document.getElementById('layersPanel').classList.remove('open');
+    document.getElementById('layersBtn')?.classList.remove('on');
+  }
+}
+function toggleLP(type) {
+  togglePOILayer(type); // existing function
+  const toggle = document.getElementById(`lp-toggle-${type}`);
+  if (toggle) toggle.classList.toggle('on', poi.enabled[type]);
+}
+
+// ═══ 3D AMÉLIORÉ ═══
+let _3dAutoRotate = null;
 
 // PWA
 if ('serviceWorker' in navigator) {
