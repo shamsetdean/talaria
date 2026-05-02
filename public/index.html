@@ -190,7 +190,7 @@ body {
 .ovl-banner {
   position: fixed;
   top: calc(68px + var(--safe-top));
-  left: 14px; right: 14px;
+  left: 14px; right: 72px;
   z-index: 95;
   background: rgba(255,155,50,0.96);
   -webkit-backdrop-filter: blur(20px);
@@ -244,17 +244,19 @@ body {
 /* Tap card */
 #tapCard {
   position: fixed;
-  top: calc(64px + var(--safe-top));
-  left: 12px; right: 12px;
+  top: calc(68px + var(--safe-top));
+  left: 14px;
+  right: 72px; /* espace pour le groupe de boutons (42px + 16px marges) */
   z-index: 95;
-  background: var(--bg-3);
-  -webkit-backdrop-filter: blur(28px);
-  backdrop-filter: blur(28px);
-  border: 0.5px solid var(--bd-2);
-  border-radius: 16px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(32px) saturate(180%);
+  border: 0.5px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 20px;
   padding: 14px 16px;
-  transform: translateY(-150%);
-  transition: transform .4s cubic-bezier(.32,.72,0,1);
+  transform: translateY(-160%);
+  transition: transform .42s cubic-bezier(.32,.72,0,1);
   pointer-events: auto;
 }
 #tapCard.show { transform: translateY(0); }
