@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentions légales — Talaria</title>
+<meta name="theme-color" content="#07080f">
+<style>
+:root{
+  --bg:#07080f; --bg-2:#12141f;
+  --ink:#ffffff; --ink-2:rgba(255,255,255,.68); --ink-3:rgba(255,255,255,.42);
+  --line:rgba(255,255,255,.10);
+  --accent:#4488ff;
+  --sans:system-ui,-apple-system,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.7}
+header{padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+header strong{letter-spacing:-.01em}
+header a{color:var(--ink-3);text-decoration:none;font-size:.85rem}
+header a:hover{color:var(--ink)}
+main{max-width:700px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+h1{font-size:clamp(1.5rem,4vw,2.1rem);margin-bottom:.4rem;letter-spacing:-.01em}
+.sub{color:var(--ink-3);font-size:.88rem;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}
+section{margin-bottom:2.1rem;padding-bottom:2.1rem;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.label{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.5rem}
+h2{font-size:1.1rem;font-weight:700;margin-bottom:.7rem}
+p{font-size:.91rem;color:var(--ink-2);margin-bottom:.65rem}
+p:last-child{margin-bottom:0}
+strong{color:var(--ink);font-weight:700}
+a{color:var(--accent)}
+.info{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.3rem;margin:.85rem 0}
+.info p{font-size:.87rem;margin-bottom:.4rem}
+.info p:last-child{margin-bottom:0}
+.ok{color:#5ce090}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:.75rem 0}
+th{text-align:left;font-weight:600;color:var(--ink-3);padding:.5rem .6rem;border-bottom:1px solid var(--line);font-size:.72rem;letter-spacing:.03em;text-transform:uppercase}
+td{padding:.5rem .6rem;border-bottom:1px solid var(--line);color:var(--ink-2)}
+tr:last-child td{border-bottom:none}
+footer{max-width:700px;margin:0 auto;padding:1.5rem;font-size:.78rem;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+
+<header>
+  <strong>Talaria</strong>
+  <a href="index.html">← Retour</a>
+</header>
+
+<main>
+  <h1>Mentions légales</h1>
+  <p class="sub">Conformément à la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN) et au RGPD.<br>Dernière mise à jour : août 2026.</p>
+
+  <section>
+    <p class="label">01</p>
+    <h2>Éditeur</h2>
+    <div class="info">
+      <p><strong>Nom :</strong> Shams Guettaf — Anthropotech Lab</p>
+      <p><strong>Contact :</strong> <a href="mailto:shamsetdean@gmail.com">shamsetdean@gmail.com</a></p>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">02</p>
+    <h2>Hébergement</h2>
+    <div class="info">
+      <p><strong>Site :</strong> GitHub Pages — GitHub, Inc., San Francisco, CA, États-Unis</p>
+      <p><strong>Fonctions API (proxys) :</strong> Vercel Inc., San Francisco, CA, États-Unis</p>
+    </div>
+    <p>Les fonctions serveur de Talaria (<code>/api/*</code>) sont de simples relais techniques vers les API listées ci-dessous : elles transmettent la requête, renvoient la réponse, et ne conservent aucune donnée.</p>
+  </section>
+
+  <section>
+    <p class="label">03</p>
+    <h2>Données personnelles — RGPD</h2>
+    <p><strong>Ce qui reste sur votre appareil, jamais transmis à un serveur :</strong></p>
+    <div class="info">
+      <p class="ok">✓ Adresses enregistrées (domicile, travail, favoris)</p>
+      <p class="ok">✓ Contacts SMS rapides</p>
+      <p class="ok">✓ Trajets favoris</p>
+    </div>
+    <p><strong>Géolocalisation :</strong> avec votre autorisation (demandée par le navigateur), Talaria utilise votre position pour centrer la carte et calculer des itinéraires. Lors d'une recherche d'itinéraire, votre position ou les points de trajet saisis sont transmis aux API tierces suivantes :</p>
+    <table>
+      <thead><tr><th>Service</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td>IDFM PRIM</td><td>Horaires et itinéraires transports en commun</td></tr>
+        <tr><td>SNCF</td><td>Informations trafic ferroviaire</td></tr>
+        <tr><td>OpenStreetMap (Overpass)</td><td>Données cartographiques</td></tr>
+        <tr><td>API Adresse (data.gouv.fr)</td><td>Recherche et validation d'adresses</td></tr>
+        <tr><td>Vélib' (GBFS)</td><td>Disponibilité des stations</td></tr>
+        <tr><td>Open-Meteo</td><td>Conditions météo</td></tr>
+      </tbody>
+    </table>
+    <p>Talaria ne conserve pas ces données au-delà du temps nécessaire à la requête. Chacun de ces services tiers traite les données selon sa propre politique de confidentialité.</p>
+    <p><strong>Base légale :</strong> consentement, via l'autorisation de géolocalisation accordée dans votre navigateur — révocable à tout moment dans les réglages de votre appareil.</p>
+    <p>Conformément au RGPD, pour toute question sur ces traitements : <a href="mailto:shamsetdean@gmail.com">shamsetdean@gmail.com</a>.</p>
+  </section>
+
+  <section>
+    <p class="label">04</p>
+    <h2>Sécurité</h2>
+    <p>Les clés d'accès aux API tierces nécessitant une authentification (SNCF, IDFM PRIM) sont conservées côté serveur (variables d'environnement Vercel) et ne transitent jamais dans le code envoyé à votre navigateur.</p>
+  </section>
+
+  <section>
+    <p class="label">05</p>
+    <h2>Propriété intellectuelle</h2>
+    <p>Le code source de Talaria est la propriété de Shams Guettaf — Anthropotech Lab. Voir le fichier <a href="../LICENSE">LICENSE</a> du dépôt.</p>
+  </section>
+
+  <section>
+    <p class="label">06</p>
+    <h2>Contact</h2>
+    <p><a href="mailto:shamsetdean@gmail.com">shamsetdean@gmail.com</a></p>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Anthropotech Lab</p>
+  <p><a href="index.html">← Retour à Talaria</a></p>
+</footer>
+
+</body>
+</html>
